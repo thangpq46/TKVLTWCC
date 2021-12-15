@@ -55,8 +55,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-MEDIA_URL = '/media/' # add this
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # add this
+# MEDIA_URL = '/media/' # add this
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # add this
 ROOT_URLCONF = 'api.urls'
 
 TEMPLATES = [
@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'tkvltwcc',
+        'NAME': 'tkvltw',
         'USER': 'root',
         'PASSWORD': '@t04062001',
         'PORT': '3306',

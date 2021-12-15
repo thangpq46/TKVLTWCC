@@ -63,87 +63,23 @@
       </div>
     </section>
     <section class="container g-0 bg-light">
-      <h2 class="block-header-title text-center">Sản Phẩm Mới Về</h2>
-      <div
-        id="carouselExampleControls"
-        class="carousel slide"
-        data-ride="carousel"
-      >
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <div class="row g-0">
-              <div
-                v-for="product in products"
-                :key="product.productid"
-                class="col-6 col-lg-3"
-              >
-                <div class="product">
-                  <div class="img-thumbnail">
-                    <img class="img-fluid" :src="product.img" />
-                  </div>
-                  <div class="product_title">
-                    <a :href="getproductsurl(product.productid)"
-                      >{{ getsortname(product.name).name }}...</a
-                    >
-                  </div>
-                  <div class="product_price">
-                    <span>{{ product.price }}$</span>
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      class="btn btn-primary add-to-cart col-12"
-                    >
-                      Mua Ngay
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <div class="row g-0">
-              <div
-                v-for="product in products"
-                :key="product.productid"
-                class="col-6 col-lg-3"
-              >
-                <div class="product">
-                  <div class="img-thumbnail">
-                    <img class="img-fluid" :src="product.img" />
-                  </div>
-                  <div class="product_title">
-                    <a :href="getproductsurl(product.productid)"
-                      >{{ getsortname(product.name).name }}...</a
-                    >
-                  </div>
-                  <div class="product_price">
-                    <span>{{ product.price }}$</span>
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      class="btn btn-primary add-to-cart col-12"
-                    >
-                      Mua Ngay
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      <h2 class="block-header-title">Danh Mục Laptop</h2>
+      <div class="row list-item">
+        <div v-for="brand in brands" :key="brand.brandname" class="col-4 col-lg-2">
+          <a :href="filterproducts(brand.brandname)">
+          <img
+            class="img-fluid"
+            :src="brand.img"
+          />
+          </a>
         </div>
-        <div
-          class="swiper-button-next swiper-button-white"
-          tabindex="0"
-          role="button"
-          aria-label="Next slide"
-          aria-controls="swiper-wrapper-15c74708f327831d"
-        ></div>
       </div>
+    </section>
+    <section class="container g-0 bg-light">
+      <h2 class="block-header-title text-center">Sản Phẩm Mới Về</h2>
       <div class="row g-0">
         <div
-          v-for="product in products"
+          v-for="product in newproducts"
           :key="product.productid"
           class="col-6 col-lg-3"
         >
@@ -172,7 +108,7 @@
       <h2 class="block-header-title text-center">Sản Phẩm Nổi Bật</h2>
       <div class="row g-0">
         <div
-          v-for="product in products"
+          v-for="product in instockproducts"
           :key="product.productid"
           class="col-6 col-lg-3"
         >
@@ -201,7 +137,7 @@
       <h2 class="block-header-title text-center">Sản Phẩm Bán Chạy</h2>
       <div class="row g-0">
         <div
-          v-for="product in products"
+          v-for="product in hotproducts"
           :key="product.productid"
           class="col-6 col-lg-3"
         >
@@ -233,8 +169,11 @@
 <script>
 export default {
   async asyncData({ $axios }) {
-    const products = await $axios.$get('/products/')
-    return { products }
+    const brands = await $axios.$get('/brand/')
+    const newproducts = await $axios.$get('/products/')
+    const instockproducts = await $axios.$get('/products/')
+    const hotproducts = await $axios.$get('/products/')
+    return { newproducts, instockproducts, hotproducts, brands }
   },
   methods: {
     getsortname(name) {
@@ -245,6 +184,20 @@ export default {
       const url = '/products/' + productid
       return url
     },
+    async addtocart(ProductName) {
+      await this.$axios.$post('addtocart/', {
+        productname: ProductName,
+      })
+      this.$nuxt.refresh()
+    },
+    filterproducts(searchinput){
+      if (searchinput === '') {
+        return "/products"
+      }
+      else {
+        return"/products/filter/"+ searchinput
+      }
+    }
   },
 }
 </script>
