@@ -175,13 +175,13 @@ def Checkout(request):
 
 @api_view(['GET'])
 def NewProductView(request):
-    queryset=Product.objects.all().order_by('createdate').desc()[:8]
+    queryset=Product.objects.all().order_by('-createdate')[:8]
     serializers=ProductSerializer(queryset,many=True,context={'request': request}).data
     return Response(serializers)
 
 @api_view(['GET'])
 def instockProductView(request):
-    queryset=Product.objects.all().order_by('stock').desc()[:8]
+    queryset=Product.objects.all().order_by('-stock')[:8]
     serializers=ProductSerializer(queryset,many=True,context={'request': request}).data
     return Response(serializers)
 
@@ -196,3 +196,17 @@ def BrandView(request):
     queryset=Brand.objects.all()
     serializers=BrandSerializer(queryset,many=True,context={'request': request}).data
     return Response(serializers)
+
+@api_view(['GET','POST'])
+@permission_classes([IsAdminUser])
+def AdminOrderView(request):
+    if request.method == 'GET':
+        queryset=Orders.objects.all().order_by('-orderdate')
+        orders = OrdersSerializer(queryset,many=True).data
+        for order in orders:
+            queryset= Orderdetails.objects.filter(orderid=order['orderid'])
+            details = OrderdetailsSerializer(queryset,many=True).data
+            order['details']=details
+        return Response(order)
+    else:
+        pass

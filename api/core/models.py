@@ -29,7 +29,7 @@ class Cart(models.Model):
 class Cartdetails(models.Model):
     deltailsid = models.AutoField(db_column='DeltailsID', primary_key=True)  # Field name made lowercase.
     productname = models.CharField(db_column='ProductName', max_length=200)
-    img = models.FileField(db_column='IMG', max_length=200,default='')  # Field name made lowercase.
+    img = models.CharField(db_column='IMG', max_length=200,default='')  # Field name made lowercase.
     quantity = models.IntegerField(default=1)
     price = models.FloatField(db_column='Price')  # Field name made lowercase.
     username = models.CharField(max_length=200)

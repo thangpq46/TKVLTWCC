@@ -96,7 +96,7 @@
               <span>{{ product.price }}$</span>
             </div>
             <div>
-              <button type="button" class="btn btn-primary add-to-cart col-12">
+              <button type="button" class="btn btn-primary add-to-cart col-12" @click="addtocart(product.name)">
                 Mua Ngay
               </button>
             </div>
@@ -125,7 +125,7 @@
               <span>{{ product.price }}$</span>
             </div>
             <div>
-              <button type="button" class="btn btn-primary add-to-cart col-12">
+              <button type="button" class="btn btn-primary add-to-cart col-12" @click="addtocart(product.name)">
                 Mua Ngay
               </button>
             </div>
@@ -154,7 +154,7 @@
               <span>{{ product.price }}$</span>
             </div>
             <div>
-              <button type="button" class="btn btn-primary add-to-cart col-12">
+              <button type="button" class="btn btn-primary add-to-cart col-12" @click="addtocart(product.name)">
                 Mua Ngay
               </button>
             </div>
@@ -170,9 +170,9 @@
 export default {
   async asyncData({ $axios }) {
     const brands = await $axios.$get('/brand/')
-    const newproducts = await $axios.$get('/products/')
-    const instockproducts = await $axios.$get('/products/')
-    const hotproducts = await $axios.$get('/products/')
+    const newproducts = await $axios.$get('/newproducts/')
+    const instockproducts = await $axios.$get('/instockproducts/')
+    const hotproducts = await $axios.$get('/hotproducts/')
     return { newproducts, instockproducts, hotproducts, brands }
   },
   methods: {

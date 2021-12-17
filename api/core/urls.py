@@ -17,9 +17,10 @@ urlpatterns = [
     path('products/<str:code>/', ProductbycodeView,name='productbycode'),
     path('productsfilter/', Productfilter,name='productfilter'),
     path('brand/', BrandView,name='brand'),
-    path('newproducts', NewProductView,name='newproducts'),
-    path('instockproducts', instockProductView,name='instockproducts'),
-    path('hotproducts', HotProductView,name='hotproducts'),
+    path('newproducts/', NewProductView,name='newproducts'),
+    path('instockproducts/', instockProductView,name='instockproducts'),
+    path('hotproducts/', HotProductView,name='hotproducts'),
     path('checkout/',Checkout,name='checkout'),
     path('changecartdetails/',changecartdetails,name='changecart'),
+    path('adminorderview/',AdminOrderView,name='adminorderview'),
 ]
