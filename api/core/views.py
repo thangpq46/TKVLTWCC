@@ -50,15 +50,15 @@ def register(request):
             User.objects.get(email=email)
             return Response({'status':'email alrealdy exist'})
         except User.DoesNotExist:
-            return Response({'status':'email is goood'})
-        if rpassword !=password:
-            return Response({'status':'password not match'})
-        user = User.objects.create_user(username,email,password)
-        user.last_name = lastname
-        user.first_name = firstname
-        print(user)
-        Cart.objects.create(username=username,carttotal=0)
-        return Response({'status':'register success'})
+            if rpassword !=password:
+                return Response({'status':'password not match'})
+            user = User.objects.create_user(username,email,password)
+            user.last_name = lastname
+            user.first_name = firstname
+            user.save()
+            print(user)
+            Cart.objects.create(username=username,carttotal=0)
+            return Response({'status':'register success'})
 
 @api_view(['GET'])
 def ProductView(request):
@@ -127,9 +127,6 @@ def userview(request):
     querycart = Cartdetails.objects.filter(username=username)
     numofproduct = len(CartdetailsSerializer(querycart,many=True).data)
     user["productincart"] = numofproduct
-    # Address =Address.objects.filter(username=username)
-    # Addressobj = AddressSerializer(Address,many=True).data[0]
-    # user["defaultaddress"] = Addressobj
     queryset=Cart.objects.filter(username=username)
     cart=CartSerializer(queryset,many=True).data[0]
     user["cart"] = cart
@@ -146,10 +143,7 @@ def changecartdetails(request):
     data = request.data.get('data')
     productname = data['productname']
     operator = data['operator']
-    # productname = request.data.get('productname')
-    # operator= request.data.get('operator')
     username = request.user.username
-    
     if operator == 'x':
         Cartdetails.objects.filter(productname=productname, username=username).delete()
     else:

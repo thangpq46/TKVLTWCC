@@ -80,7 +80,7 @@
       <div class="row g-0">
         <div
           v-for="product in newproducts"
-          :key="product.productid"
+          :key="product.productcode"
           class="col-6 col-lg-3"
         >
           <div class="product">
@@ -88,7 +88,7 @@
               <img class="img-fluid" :src="product.img" />
             </div>
             <div class="product_title">
-              <a :href="getproductsurl(product.productid)"
+              <a :href="getproductsurl(product.productcode)"
                 >{{ getsortname(product.name).name }}...</a
               >
             </div>
@@ -109,7 +109,7 @@
       <div class="row g-0">
         <div
           v-for="product in instockproducts"
-          :key="product.productid"
+          :key="product.productcode"
           class="col-6 col-lg-3"
         >
           <div class="product">
@@ -117,7 +117,7 @@
               <img class="img-fluid" :src="product.img" />
             </div>
             <div class="product_title">
-              <a :href="getproductsurl(product.productid)"
+              <a :href="getproductsurl(product.productcode)"
                 >{{ getsortname(product.name).name }}...</a
               >
             </div>
@@ -138,7 +138,7 @@
       <div class="row g-0">
         <div
           v-for="product in hotproducts"
-          :key="product.productid"
+          :key="product.productcode"
           class="col-6 col-lg-3"
         >
           <div class="product">
@@ -146,7 +146,7 @@
               <img class="img-fluid" :src="product.img" />
             </div>
             <div class="product_title">
-              <a :href="getproductsurl(product.productid)"
+              <a :href="getproductsurl(product.productcode)"
                 >{{ getsortname(product.name).name }}...</a
               >
             </div>

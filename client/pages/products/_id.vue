@@ -20,7 +20,7 @@
             <section class="container g-0 bg-light">
       <h2 class="block-header-title text-center">Sản Phẩm Tương Tự</h2>
       <div class="row g-0">
-        <div v-for="p in products" :key="p.productid" class="col-6 col-lg-3">
+        <div v-for="p in products" :key="p.productcode" class="col-6 col-lg-3">
           <div class="product">
             <div class="img-thumbnail">
               <img
@@ -29,7 +29,7 @@
               />
             </div>
             <div class="product_title">
-              <a :href="getproductsurl(p.productid)"
+              <a :href="getproductsurl(p.productcode)"
                 >{{getsortname(p.name).name}}...</a
               >
             </div>
