@@ -34,17 +34,31 @@ def login(request):
 
 @api_view(['POST'])
 def register(request):
-    username= request.data.get('username')
-    email= request.data.get('email')
-    firstname= request.data.get('firstname')
-    lastname= request.data.get('lastname')
-    password= request.data.get('password')
-    rpassword= request.data.get('rpassword')
-    if rpassword !=password:
-        return Response({'status':'pass not match'})
-    user = User.objects.create_user(username,email,password)
-    Cart.objects.create(username=username,carttotal=0)
-    return Response({'status':'success'})
+    print(request.data)
+    user = request.data.get('user')
+    username= user['username']
+    email= user['email']
+    firstname= user['first_name']
+    lastname= user['last_name']
+    password= user['password']
+    rpassword= user['rpassword']
+    try:
+        User.objects.get(username=username)
+        return Response({'status':'user alrealdy exist'})
+    except User.DoesNotExist:
+        try:
+            User.objects.get(email=email)
+            return Response({'status':'email alrealdy exist'})
+        except User.DoesNotExist:
+            return Response({'status':'email is goood'})
+        if rpassword !=password:
+            return Response({'status':'password not match'})
+        user = User.objects.create_user(username,email,password)
+        user.last_name = lastname
+        user.first_name = firstname
+        print(user)
+        Cart.objects.create(username=username,carttotal=0)
+        return Response({'status':'register success'})
 
 @api_view(['GET'])
 def ProductView(request):
