@@ -24,5 +24,6 @@ urlpatterns = [
     path('checkout/',Checkout,name='checkout'),
     path('changecartdetails/',changecartdetails,name='changecart'),
     path('adminorderview/',AdminOrderView,name='adminorderview'),
-    path("", include(router.urls))
+    path("", include(router.urls)),
+    path('productadminview/',productadminview,name='productadminview'),
 ]

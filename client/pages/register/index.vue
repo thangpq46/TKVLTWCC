@@ -113,17 +113,12 @@
 import Notification from '~/components/Notification'
 
 export default {
+  auth: 'guest',
   name: 'Login',
   components: {
     Notification,
   },
   layout: 'clean',
-  asyncData({ redirect }) {
-    // const status ='register success';
-    // if(data.status==='register success'){
-    //   return redirect('/login')
-    // }
-  },
   data() {
     return {
       user: {
@@ -145,6 +140,9 @@ export default {
       })
       this.$nuxt.refresh()
       this.status = response.status
+      if(this.status ==='register success'){
+        this.$router.push('/login/')
+      }
     },
   },
 }

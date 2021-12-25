@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate
 from rest_framework.reverse import reverse
 import requests
+import re
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -13,13 +14,13 @@ from .models import *
 def login(request):
     username= request.data.get('username')
     password= request.data.get('password')
+    if not User.objects.filter(username=username).exists() or User.objects.filter(email=username).exists():
+        raise  Response('User does not exist')
+    if User.objects.filter(email=username).exists():
+        username=User.objects.get(email=username).username
     user = authenticate(username=username, password=password)
     if user is None:
-        if not User.objects.filter(username=username):
-            raise exceptions.AuthenticationFailed('User does not exist')
-        else:
-            raise exceptions.AuthenticationFailed('Incorred password')
-    serializers = UserSerializer(user)
+        raise Response({ 'error' :'Incorred password'})
     token_endpoint = reverse(viewname='token_obtain_pair',request=request)
     token = requests.post(token_endpoint, data=request.data).json()
     response = Response()
@@ -27,9 +28,15 @@ def login(request):
         'access': token.get('access'),
         'refresh': token.get('refresh'),
         'username': username,
+        'status':'Login success'
     }
     return response
 
+def validpassword(p):
+    if (len(p)<6 or len(p)>12) or not re.search("[a-z]",p) or not re.search("[0-9]",p) or not re.search("[A-Z]",p) :
+        return False
+    return True
+    
 @api_view(['POST'])
 def register(request):
     print(request.data)
@@ -40,23 +47,21 @@ def register(request):
     lastname= user['last_name']
     password= user['password']
     rpassword= user['rpassword']
-    try:
-        User.objects.get(username=username)
+    if User.objects.filter(username=username).exists():
         return Response({'status':'user alrealdy exist'})
-    except User.DoesNotExist:
-        try:
-            User.objects.get(email=email)
-            return Response({'status':'email alrealdy exist'})
-        except User.DoesNotExist:
-            if rpassword !=password:
-                return Response({'status':'password not match'})
-            user = User.objects.create_user(username,email,password)
-            user.last_name = lastname
-            user.first_name = firstname
-            user.save()
-            print(user)
-            Cart.objects.create(username=username,carttotal=0)
-            return Response({'status':'register success'})
+    elif User.objects.filter(email=email).exists():
+        return Response({'status':'email alrealdy exist'})
+    elif validpassword(password)== False:
+        return Response({'status':'Password have length from 6-12 char.It must cointain at least 1 num, 1 lowercase and 1 uppercase.'})
+    elif rpassword !=password:
+        return Response({'status':'password not match'})
+    else:
+        user = User.objects.create_user(username,email,password)
+        user.last_name = lastname
+        user.first_name = firstname
+        user.save()
+        Cart.objects.create(username=username,carttotal=0)
+        return Response({'status':'register success'})
 
 @api_view(['GET'])
 def ProductView(request):
@@ -228,4 +233,17 @@ def AdminOrderView(request):
 class AdminProductView(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
-        
+
+@api_view(['POST'])
+def productadminview(request):
+    productcode = request.data.get('productcode')
+    name = request.data.get('name')
+    price = request.data.get('price')
+    description = request.data.get('description')
+    stock = request.data.get('stock')
+    brand = request.data.get('brandname')
+    img = request.data.get('img')
+    if (Product.objects.filter(productcode=productcode).exists()) == False and (Product.objects.filter(name=name).exists())==False :
+        Product.objects.create(productcode=productcode, name=name,price=price, description=description,img=img, brand=brand)
+        return Response({'status': 'success'})
+    return Response({'status': 'Productcode or Productname alrealdy exist'})   

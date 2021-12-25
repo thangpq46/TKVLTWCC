@@ -33,6 +33,7 @@
 <script>
 
 export default {
+    auth: 'guest',
     async asyncData({ $axios,params}) {
         const products = await $axios.$get(`/products/`)
         return {products}

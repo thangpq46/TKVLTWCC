@@ -168,6 +168,7 @@
 
 <script>
 export default {
+  auth: 'guest',
   async asyncData({ $axios }) {
     const brands = await $axios.$get('/brand/')
     const newproducts = await $axios.$get('/newproducts/')
@@ -185,11 +186,16 @@ export default {
       return url
     },
     async addtocart(ProductName) {
-      await this.$axios.$post('addtocart/', {
+      if(this.$auth.loggedIn){
+        await this.$axios.$post('addtocart/', {
         productname: ProductName,
       })
       this.$nuxt.refresh();
       this.$router.go()
+      }
+      else{
+        this.$router.push('/login/');
+      }
     },
     filterproducts(searchinput){
       if (searchinput === '') {

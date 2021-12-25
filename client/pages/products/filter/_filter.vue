@@ -33,6 +33,7 @@
 <script>
 
 export default {
+    auth: 'guest',
     async asyncData({ $axios,params}) {
         const filterproducts = await $axios.$post(`/productsfilter/`,{
           filterdata: params.filter

@@ -13,7 +13,7 @@
                     </div>
                     <h4 v-if="product.stock > 1">Còn Hàng</h4>
                     <h4 v-else>Hết Hàng</h4>
-                    <button class="btn btn-primary">MUA HÀNG</button>
+                    <button class="btn btn-primary" @click="addtocart(product.name)">MUA HÀNG</button>
                 </div>
             </div>
         </div>
@@ -51,6 +51,7 @@
 <script>
 
 export default {
+    auth: 'guest auth',
     async asyncData({ $axios,params}) {
         const product = await $axios.$get(`/products/${params.id}`)
         const products = await $axios.$get(`/products`)
@@ -65,6 +66,18 @@ export default {
     getproductsurl(productid){
       const url = '/products/'+productid
       return url;
+    },
+        async addtocart(ProductName) {
+      if(this.$auth.loggedIn){
+        await this.$axios.$post('addtocart/', {
+        productname: ProductName,
+      })
+      this.$nuxt.refresh();
+      this.$router.go()
+      }
+      else{
+        this.$router.push('/login/');
+      }
     },
   }
 }

@@ -62,7 +62,7 @@ export default {
       }
       try {
         
-        const response = await this.$axios.$post("/adminproduct/",formData,config);
+        const response = await this.$axios.$post("/productadminview/",formData,config);
         console.log(response);
       } catch (e) {
         console.log(e);

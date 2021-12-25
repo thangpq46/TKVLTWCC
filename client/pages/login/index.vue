@@ -21,7 +21,7 @@
                       v-model="user.username"
                       type="text"
                       class="form-control"
-                      placeholder="username"
+                      placeholder="username or email"
                     />
                   </b-input-group>
 
@@ -78,9 +78,15 @@ export default {
 
   methods: {
     async login() {
-      const response = await this.$auth.loginWith('local', { data: this.user })
-      this.$auth.$storage.setUniversal('username', response.data.username)
-      console.log(response)
+      try{
+        const response = await this.$auth.loginWith('local', { data: this.user })
+        this.error = response
+        this.$auth.$storage.setUniversal('username', response.data.username)
+        console.log(response)
+      }
+      catch(e) {
+        this.error = e
+      }
     },
   },
 }
