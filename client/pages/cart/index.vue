@@ -35,6 +35,7 @@ export default {
         data: this.details
       })
       this.$nuxt.refresh()
+      this.$router.go()
     },
   },
 }

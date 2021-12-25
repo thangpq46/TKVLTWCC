@@ -12,7 +12,7 @@
     <div v-if="$auth.loggedIn">
       <div>Wellcome {{ $auth.user.first_name }}{{$auth.user.last_name }}</div>
       <NuxtLink to="/cart">Cart {{ $auth.user.productincart}}</NuxtLink>
-      <NuxtLink to="/">Logout</NuxtLink>
+      <NuxtLink to="/"><button @click="logout">Logout</button></NuxtLink>
     </div>
     <div v-else>
       <NuxtLink to="/login">Login</NuxtLink>
@@ -35,7 +35,10 @@ export default {
       else {
         return"/products/filter/"+ searchinput
       }
-    }
+    },
+    logout(){
+      
+    },
   }
 }
 </script>

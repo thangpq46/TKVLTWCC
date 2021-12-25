@@ -10,7 +10,7 @@
     <div><span>{{ $auth.user.email }}</span></div>
     <div><span>Shipping address: <input v-model="shippingaddress" type="text" placeholder="hihi" required></span></div>
     <div><span>Total: {{ $auth.user.cart.carttotal }}</span></div>
-    <div><button type="button" @click="checkout">Checkout</button></div>
+    <div><button type="button" @click="checkout()">Checkout</button></div>
   </div>
 </template>
 <script>
@@ -30,7 +30,7 @@ export default {
         address : this.shippingaddress
         }
       )
-      this.$nuxt.refresh()
+      this.$router.push('/')
     },
   },
 }

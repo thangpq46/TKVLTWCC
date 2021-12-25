@@ -1,9 +1,10 @@
 from django.urls import path,include
 from .views import *
 from django.conf import settings
-from rest_framework import routers,request
+from rest_framework.routers import DefaultRouter
 
-
+router = DefaultRouter()
+router.register(r'adminproduct', AdminProductView)
 
 urlpatterns = [
     # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
@@ -23,4 +24,5 @@ urlpatterns = [
     path('checkout/',Checkout,name='checkout'),
     path('changecartdetails/',changecartdetails,name='changecart'),
     path('adminorderview/',AdminOrderView,name='adminorderview'),
+    path("", include(router.urls))
 ]

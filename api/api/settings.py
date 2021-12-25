@@ -57,6 +57,10 @@ MIDDLEWARE = [
 
 # MEDIA_URL = '/media/' # add this
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # add this
+
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3000',
+)
 ROOT_URLCONF = 'api.urls'
 
 TEMPLATES = [

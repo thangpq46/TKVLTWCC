@@ -9,7 +9,7 @@
               <b-card no-body class="p-4">
                 <b-card-body>
                   <h1>Register</h1>
-                  <Notification v-if="error" :message="error" />
+                  <Notification v-if="status" :message="status" />
                   <p class="text-muted">Register your account</p>
                   <b-input-group class="mb-3">
                     <b-input-group-prepend>
@@ -118,7 +118,12 @@ export default {
     Notification,
   },
   layout: 'clean',
-
+  asyncData({ redirect }) {
+    // const status ='register success';
+    // if(data.status==='register success'){
+    //   return redirect('/login')
+    // }
+  },
   data() {
     return {
       user: {
@@ -129,16 +134,17 @@ export default {
         last_name:'Thắng',
         rpassword:'@t04062001',
       },
-      error: null,
+      status: null,
     }
   },
 
   methods: {
     async register() {
-      await this.$axios.$post('register/', {
+      const response = await this.$axios.$post('register/', {
         user: this.user
       })
       this.$nuxt.refresh()
+      this.status = response.status
     },
   },
 }

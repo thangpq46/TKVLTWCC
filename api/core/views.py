@@ -1,11 +1,9 @@
 from django.contrib.auth import authenticate
 from rest_framework.reverse import reverse
 import requests
-import jwt,datetime
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework import viewsets
-from rest_framework.views import APIView
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.permissions import *
 from .serializers import *
@@ -69,12 +67,12 @@ def ProductView(request):
 @api_view(['GET'])    
 def ProductbycodeView(request,code):
     queryset=Product.objects.filter(productcode=code)
+    print(ProductSerializer(queryset,many=True,context={'request': request}).data)
     serializers=ProductSerializer(queryset,many=True,context={'request': request}).data[0]
     return Response(serializers)
 
 @api_view(['POST'])    
 def Productfilter(request):
-    print(request.data)
     filterdata = "%" +request.data.get('filterdata')+"%"
     try:
         queryset=Product.objects.raw('''SELECT * FROM core_product WHERE Name LIKE %s''',[filterdata])
@@ -215,6 +213,19 @@ def AdminOrderView(request):
             queryset= Orderdetails.objects.filter(orderid=order['orderid'])
             details = OrderdetailsSerializer(queryset,many=True).data
             order['details']=details
-        return Response(order)
+        return Response(orders)
     else:
-        pass
+        orderid = request.data.get('orderid')
+        order = Orders.objects.get(orderid=orderid)
+        if order.orderstatus == 'pending':
+            order.orderstatus = 'confirmed'
+            order.save()
+        elif order.orderstatus == 'confirmed':
+            order.orderstatus = 'done'
+            order.save()
+        return Response()
+
+class AdminProductView(viewsets.ModelViewSet):
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all()
+        

@@ -188,7 +188,8 @@ export default {
       await this.$axios.$post('addtocart/', {
         productname: ProductName,
       })
-      this.$nuxt.refresh()
+      this.$nuxt.refresh();
+      this.$router.go()
     },
     filterproducts(searchinput){
       if (searchinput === '') {
