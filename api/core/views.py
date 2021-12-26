@@ -15,12 +15,12 @@ def login(request):
     username= request.data.get('username')
     password= request.data.get('password')
     if not User.objects.filter(username=username).exists() or User.objects.filter(email=username).exists():
-        raise  Response('User does not exist')
+        raise  exceptions.AuthenticationFailed('User does not exist')
     if User.objects.filter(email=username).exists():
         username=User.objects.get(email=username).username
     user = authenticate(username=username, password=password)
     if user is None:
-        raise Response({ 'error' :'Incorred password'})
+        raise exceptions.AuthenticationFailed({ 'error' :'Incorred password'})
     token_endpoint = reverse(viewname='token_obtain_pair',request=request)
     token = requests.post(token_endpoint, data=request.data).json()
     response = Response()
@@ -61,6 +61,7 @@ def register(request):
         user.first_name = firstname
         user.save()
         Cart.objects.create(username=username,carttotal=0)
+        Profile.objects.create(username=username)
         return Response({'status':'register success'})
 
 @api_view(['GET'])
@@ -72,7 +73,6 @@ def ProductView(request):
 @api_view(['GET'])    
 def ProductbycodeView(request,code):
     queryset=Product.objects.filter(productcode=code)
-    print(ProductSerializer(queryset,many=True,context={'request': request}).data)
     serializers=ProductSerializer(queryset,many=True,context={'request': request}).data[0]
     return Response(serializers)
 
@@ -133,6 +133,16 @@ def userview(request):
     queryset=Cart.objects.filter(username=username)
     cart=CartSerializer(queryset,many=True).data[0]
     user["cart"] = cart
+    queryimg = Profile.objects.filter(username=username)
+    try:
+        profile = ProfileSerializer(queryimg,many=True,context={'request': request}).data[0]
+        print("this line run smoth")
+    except:
+        Profile.objects.create(username=username)
+        profile = ProfileSerializer(queryimg,many=True,context={'request': request}).data[0]
+        print("ops it jump to this")
+    print (profile['img'])
+    user["img"] = profile['img']
     response = Response()
     response.data ={
         'user': user
@@ -230,20 +240,32 @@ def AdminOrderView(request):
             order.save()
         return Response()
 
-class AdminProductView(viewsets.ModelViewSet):
-    serializer_class = ProductSerializer
-    queryset = Product.objects.all()
+# class AdminProductView(viewsets.ModelViewSet):
+#     serializer_class = ProductSerializer
+#     queryset = Product.objects.all()
 
 @api_view(['POST'])
 def productadminview(request):
+    trequest = request.data.get('type')
     productcode = request.data.get('productcode')
     name = request.data.get('name')
     price = request.data.get('price')
     description = request.data.get('description')
     stock = request.data.get('stock')
-    brand = request.data.get('brandname')
+    brandid = request.data.get('brandname')
+    brand = Brand.objects.get(id=brandid)
     img = request.data.get('img')
-    if (Product.objects.filter(productcode=productcode).exists()) == False and (Product.objects.filter(name=name).exists())==False :
-        Product.objects.create(productcode=productcode, name=name,price=price, description=description,img=img, brand=brand)
-        return Response({'status': 'success'})
-    return Response({'status': 'Productcode or Productname alrealdy exist'})   
+    productid = request.data.get('id')
+    if trequest == 'x':
+        Product.objects.filter(id=productid).delete()
+        return Response({'status':'delete sucessful'})
+    if trequest == '+':
+        if (Product.objects.filter(productcode=productcode).exists()) == False and (Product.objects.filter(name=name).exists())==False :
+            Product.objects.create(productcode=productcode, name=name,price=price, description=description,img=img, brandname=brand,stock=stock)
+            return Response({'status': 'success'})
+        else:
+            return Response({'status': 'Productcode or Productname alrealdy exist'})
+    elif trequest == 'e':
+        return Response({'status':'well done'})
+ 
+    

@@ -62,3 +62,7 @@ class Product(models.Model):
     stock = models.IntegerField(db_column='Stock')  # Field name made lowercase.
     createdate = models.DateField(db_column='CreateDate',default=dateupdate())  # Field name made lowercase.
     brandname = models.ForeignKey(Brand, models.DO_NOTHING, db_column='BrandName')  # Field name made lowercase.
+
+class Profile(models.Model):
+    username = models.CharField(max_length=200)
+    img = models.FileField(db_column='IMG', max_length=200,default='placeholder.png')

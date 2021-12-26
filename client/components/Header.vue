@@ -10,7 +10,7 @@
     <input v-model="searchinput" type="text">
     <a :href="filterproducts(searchinput)"><button type="button" class="">Search</button></a>
     <div v-if="$auth.loggedIn">
-      <div>Wellcome {{ $auth.user.first_name }}{{$auth.user.last_name }}</div>
+      <div>Wellcome {{ $auth.user.first_name }}{{$auth.user.last_name }}<img :src="$auth.user.img"></div>
       <NuxtLink to="/cart">Cart {{ $auth.user.productincart}}</NuxtLink>
       <NuxtLink to="/"><button @click="logout">Logout</button></NuxtLink>
     </div>
@@ -36,8 +36,10 @@ export default {
         return"/products/filter/"+ searchinput
       }
     },
-    logout(){
-      
+    async logout(){
+      await this.$auth.logout(/* .... */)
+      window.localStorage.clear();
+      // console.log($cookies.keys());
     },
   }
 }

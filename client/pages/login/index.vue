@@ -77,15 +77,17 @@ export default {
   },
 
   methods: {
+    
     async login() {
       try{
         const response = await this.$auth.loginWith('local', { data: this.user })
-        this.error = response
         this.$auth.$storage.setUniversal('username', response.data.username)
-        console.log(response)
+        if(this.$auth.user.is_staff) {
+          this.$router.push('/admin')
+        }
       }
       catch(e) {
-        this.error = e
+        this.error = 'Incored Username or Password'
       }
     },
   },

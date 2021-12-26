@@ -1,30 +1,35 @@
 <template>
   <div>
-    <div>{{product}}</div>
     <div>
-        <img :src="product.img">
-        <div>
-            <input v-model="product.productcode" type="text" >
-            <input v-model="product.name" type="text" >
-            <input v-model="product.description" type="text" >
-            <input v-model="product.stock" type="textarea" >
-            <input v-model="product.brandname" type="text" >
-            <input type="file" name="file" @change="onFileChange">
-            <button @click="editproduct">Change</button>
-        </div>
+      <img :src="preview" />
+      <input type="file" @change="onFileChange" />
+      <input v-model="product.productcode" type="text" />
+      <input v-model="product.name" type="text" />
+      <input v-model="product.price" type="number" />
+      <input v-model="product.description" type="text" />
+      <input v-model="product.stock" type="number" />
+      <select v-model="product.brandname">
+        <option v-for="brand in brands" :key="brand.id" :value="brand.id">
+          {{ brand.brandname }}
+        </option>
+      </select>
+      <button @click="editProduct">Change</button>
+      <button @click="deleteProduct">Delete</button>
     </div>
-    <span>{{product}}</span>
   </div>
 </template>
 <script>
 export default {
   async asyncData({ $axios, params }) {
     const product = await $axios.$get(`/products/${params.edit}`)
-    return { product }
+    const brands = await $axios.$get('/brand/')
+    const preview = product.img
+    return { product,brands,preview}
   },
   data() {
     return {
       product: {
+        id:'',
         productcode: '',
         name: '',
         price: '',
@@ -32,15 +37,13 @@ export default {
         description: '',
         brand: '',
       },
-      fileselected: null,
-      status: 'no error',
-      preview: ''
+      type: 'e',
+      preview: '',
     }
   },
   methods: {
     onFileChange(e) {
       const files = e.target.files || e.dataTransfer.files;
-      console.log(files[0])
       if (!files.length) {
         return;
       }
@@ -48,7 +51,6 @@ export default {
       this.createImage(files[0]);
     },
     createImage(file) {
-      // let image = new Image();
       const reader = new FileReader();
       const vm = this;
       reader.onload = e => {
@@ -56,10 +58,43 @@ export default {
       };
       reader.readAsDataURL(file);
     },
-    async editproduct() {
-      this.product.img =this.fileselected
-      await this.$axios.post('adminproductsview/')
+    async editProduct() {
+      const config = {
+        headers: { "content-type": "multipart/form-data" }
+      };
+      const formData = new FormData();
+      for (const data in this.product) {
+        formData.append(data, this.product[data]);
+      }
+      formData.append('type', this.type);
+      try {
+        
+        const response = await this.$axios.$post("/productadminview/",formData,config);
+        console.log(response);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async deleteProduct() {
+      const config = {
+        headers: { "content-type": "multipart/form-data" }
+      };
+      const formData = new FormData();
+      for (const data in this.product) {
+        formData.append(data, this.product[data]);
+      }
+      this.type = 'x';
+      formData.append('type', this.type);
+      try {
+        await this.$axios.$post("/productadminview/",
+          formData,config
+        );
+        this.$router.push('/admin/products/');
+        this.$router.refresh();
+      } catch (e) {
+        console.log(e);
+      }
     }
-  },
+  }
 }
 </script>

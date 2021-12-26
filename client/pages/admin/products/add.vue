@@ -5,10 +5,15 @@
         <input type="file" @change="onFileChange">
         <input v-model="product.productcode" type="text">
         <input v-model="product.name" type="text">
-        <input v-model="product.price" type="text">
+        <input v-model="product.price" type="number">
         <input v-model="product.description" type="text">
-        <input v-model="product.stock" type="text">
-        <input v-model="product.brandname" type="text">
+        <input v-model="product.stock" type="number">
+
+        <select v-model="product.brandname">
+                  <option v-for="brand in brands" :key='brand.id' :value="brand.id">{{brand.brandname}}</option>
+                  <!-- <option value="Medium">Medium</option>
+                  <option value="Hard">Hard</option> -->
+        </select>
         <button @click="submitProduct">Add</button>
       </div>
     </div>
@@ -16,16 +21,21 @@
 
 <script>
 export default {
+    async asyncData({ $axios}){
+      const brands = await $axios.$get('/brand/')
+      return {brands}
+    },  
     data() {
     return {
       product: {
-        productcode:"3",  
-        name: "3",
+        productcode:"",  
+        name: "",
         img: "",
-        price: "3",
-        description: "3",
-        stock: "3",
-        brandname: "3"
+        price: "",
+        description: "",
+        stock: "",
+        brandname: "",
+        type:'+'
       },
       preview: ""
     };

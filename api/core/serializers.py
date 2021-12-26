@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ("productcode", "name", "price", "img", "description","stock","createdate","brandname")
+        fields = ("id","productcode", "name", "price", "img", "description","stock","createdate","brandname")
 
 class OrdersSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,7 +25,7 @@ class OrderdetailsSerializer(serializers.ModelSerializer):
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
-        fields = ("brandname", "branddes","img")
+        fields = ("id","brandname", "branddes","img")
 
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,3 +42,8 @@ class CartdetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cartdetails
         fields = ("productname","img", "quantity", "price","username")
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ("username","img")
