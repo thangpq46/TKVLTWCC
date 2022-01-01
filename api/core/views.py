@@ -33,6 +33,9 @@ def login(request):
     return response
 
 def validpassword(p):
+    print('---------')
+    print(p)
+    print('---------')
     if (len(p)<6 or len(p)>12) or not re.search("[a-z]",p) or not re.search("[0-9]",p) or not re.search("[A-Z]",p) :
         return False
     return True

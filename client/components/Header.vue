@@ -39,7 +39,6 @@ export default {
     async logout(){
       await this.$auth.logout(/* .... */)
       window.localStorage.clear();
-      // console.log($cookies.keys());
     },
   }
 }

@@ -65,12 +65,13 @@
     <section class="container g-0 bg-light">
       <h2 class="block-header-title">Danh Mục Laptop</h2>
       <div class="row list-item">
-        <div v-for="brand in brands" :key="brand.brandname" class="col-4 col-lg-2">
+        <div
+          v-for="brand in brands"
+          :key="brand.brandname"
+          class="col-4 col-lg-2"
+        >
           <a :href="filterproducts(brand.brandname)">
-          <img
-            class="img-fluid"
-            :src="brand.img"
-          />
+            <img class="img-fluid" :src="brand.img" />
           </a>
         </div>
       </div>
@@ -83,24 +84,7 @@
           :key="product.productcode"
           class="col-6 col-lg-3"
         >
-          <div class="product">
-            <div class="img-thumbnail">
-              <img class="img-fluid" :src="product.img" />
-            </div>
-            <div class="product_title">
-              <a :href="getproductsurl(product.productcode)"
-                >{{ getsortname(product.name).name }}...</a
-              >
-            </div>
-            <div class="product_price">
-              <span>{{ product.price }}$</span>
-            </div>
-            <div>
-              <button type="button" class="btn btn-primary add-to-cart col-12" @click="addtocart(product.name)">
-                Mua Ngay
-              </button>
-            </div>
-          </div>
+          <ProductCard :product="product" />
         </div>
       </div>
     </section>
@@ -112,24 +96,7 @@
           :key="product.productcode"
           class="col-6 col-lg-3"
         >
-          <div class="product">
-            <div class="img-thumbnail">
-              <img class="img-fluid" :src="product.img" />
-            </div>
-            <div class="product_title">
-              <a :href="getproductsurl(product.productcode)"
-                >{{ getsortname(product.name).name }}...</a
-              >
-            </div>
-            <div class="product_price">
-              <span>{{ product.price }}$</span>
-            </div>
-            <div>
-              <button type="button" class="btn btn-primary add-to-cart col-12" @click="addtocart(product.name)">
-                Mua Ngay
-              </button>
-            </div>
-          </div>
+          <ProductCard :product="product" />
         </div>
       </div>
     </section>
@@ -141,24 +108,7 @@
           :key="product.productcode"
           class="col-6 col-lg-3"
         >
-          <div class="product">
-            <div class="img-thumbnail">
-              <img class="img-fluid" :src="product.img" />
-            </div>
-            <div class="product_title">
-              <a :href="getproductsurl(product.productcode)"
-                >{{ getsortname(product.name).name }}...</a
-              >
-            </div>
-            <div class="product_price">
-              <span>{{ product.price }}$</span>
-            </div>
-            <div>
-              <button type="button" class="btn btn-primary add-to-cart col-12" @click="addtocart(product.name)">
-                Mua Ngay
-              </button>
-            </div>
-          </div>
+          <ProductCard :product="product" />
         </div>
       </div>
     </section>
@@ -186,25 +136,23 @@ export default {
       return url
     },
     async addtocart(ProductName) {
-      if(this.$auth.loggedIn){
+      if (this.$auth.loggedIn) {
         await this.$axios.$post('addtocart/', {
-        productname: ProductName,
-      })
-      this.$nuxt.refresh();
-      this.$router.go()
-      }
-      else{
-        this.$router.push('/login/');
+          productname: ProductName,
+        })
+        this.$nuxt.refresh()
+        this.$router.go()
+      } else {
+        this.$router.push('/login/')
       }
     },
-    filterproducts(searchinput){
+    filterproducts(searchinput) {
       if (searchinput === '') {
-        return "/products"
+        return '/products'
+      } else {
+        return '/products/filter/' + searchinput
       }
-      else {
-        return"/products/filter/"+ searchinput
-      }
-    }
+    },
   },
 }
 </script>

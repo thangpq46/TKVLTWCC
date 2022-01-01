@@ -2,6 +2,7 @@
   <div>
     <NuxtLink to="/admin/">Quản Lý đơn Hàng</NuxtLink>
     <NuxtLink to="/admin/products">Quản Lý Sản Phẩm</NuxtLink>
+    <NuxtLink to="/admin/products/add">Them San Pham</NuxtLink>
     <div v-for="order in orders" :key="order.orderstatus">
       <span>{{ order.orderid }}</span>
       <span>{{ order.orderdate }}</span>
