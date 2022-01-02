@@ -24,4 +24,5 @@ urlpatterns = [
     path('productadminview/',productadminview,name='productadminview'),
     path('submitfeed/',submitFeed,name='submitfeedback'),
     path('feedview/',feedbackView,name='feedview'),
+    path('userorders/',userorders,name='userorders'),
 ]

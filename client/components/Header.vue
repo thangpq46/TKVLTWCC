@@ -12,6 +12,7 @@
     <div v-if="$auth.loggedIn">
       <div>Wellcome {{ $auth.user.first_name }}{{$auth.user.last_name }}<img :src="$auth.user.img"></div>
       <NuxtLink to="/cart">Cart {{ $auth.user.productincart}}</NuxtLink>
+      <NuxtLink to="/user/orders"><button>Đơn Hàng của bạn</button></NuxtLink>
       <NuxtLink to="/"><button @click="logout">Logout</button></NuxtLink>
     </div>
     <div v-else>

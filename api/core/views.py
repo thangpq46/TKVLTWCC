@@ -287,3 +287,24 @@ def feedbackView(request):
     queryset = Feedback.objects.all().order_by('-id')
     serializers = FeedbackSerializer(queryset,many=True)
     return Response(serializers.data)
+
+
+@api_view(['GET','POST'])
+@permission_classes([IsAuthenticated])
+def userorders(request):
+    if request.method == 'GET':
+        username = request.user.username
+        queryset =Orders.objects.filter(username= username).order_by('-orderdate')
+        orders =OrdersSerializer(queryset,many=True).data
+        if len(orders) < 0:
+            return Response()
+        else:
+            for order in orders:
+                queryset =Orderdetails.objects.filter(orderid=order['orderid'])
+                details =OrderdetailsSerializer(queryset,many=True).data 
+                order['details'] = details
+            return Response(orders)
+    else:
+        orderid =request.data.get('orderid')
+        Orders.objects.filter(orderid=orderid).update(orderstatus='canceled')
+        return Response({'status':'Your order has been successfully canceled'})
