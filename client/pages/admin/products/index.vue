@@ -1,7 +1,6 @@
 <template>
   <div>
-    <NuxtLink to="/admin/">Quản Lý đơn Hàng</NuxtLink>
-    <NuxtLink to="/admin/products">Quản Lý Sản Phẩm</NuxtLink>
+    <AdminHeader />
     <div v-for="product in products" :key="product.productcode">
       <span><img :src="product.img"></span>
       <span>{{product.productcode}}</span>

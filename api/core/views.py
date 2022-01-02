@@ -4,7 +4,6 @@ import requests
 import re
 from django.contrib.auth.models import User
 from rest_framework.response import Response
-from rest_framework import viewsets
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.permissions import *
 from .serializers import *
@@ -221,7 +220,7 @@ def BrandView(request):
     serializers=BrandSerializer(queryset,many=True,context={'request': request}).data
     return Response(serializers)
 
-@api_view(['GET','POST'])
+@api_view(['GET','POST','DELETE'])
 @permission_classes([IsAdminUser])
 def AdminOrderView(request):
     if request.method == 'GET':
@@ -232,7 +231,7 @@ def AdminOrderView(request):
             details = OrderdetailsSerializer(queryset,many=True).data
             order['details']=details
         return Response(orders)
-    else:
+    elif request.method == 'POST':
         orderid = request.data.get('orderid')
         order = Orders.objects.get(orderid=orderid)
         if order.orderstatus == 'pending':
@@ -242,12 +241,14 @@ def AdminOrderView(request):
             order.orderstatus = 'done'
             order.save()
         return Response()
-
-# class AdminProductView(viewsets.ModelViewSet):
-#     serializer_class = ProductSerializer
-#     queryset = Product.objects.all()
+    elif request.method == 'DELETE':
+        orderid = request.data.get('orderid')
+        print(orderid)
+        Orders.objects.filter(orderid=orderid).update(orderstatus='canceled')
+        return Response({'status':'cancel success'})
 
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def productadminview(request):
     trequest = request.data.get('type')
     productcode = request.data.get('productcode')
@@ -271,4 +272,18 @@ def productadminview(request):
     elif trequest == 'e':
         return Response({'status':'well done'})
  
-    
+@api_view(['POST'])
+def submitFeed(request):
+    feedback = request.data.get('feedback')
+    try:
+        Feedback.objects.create(topic=feedback['topic'],title=feedback['title'],name=feedback['name'],email=feedback['email'],phone=feedback['phone'],des=feedback['des'])
+    except:
+        return Response({'status':'An error occurred while sending data. please try again later'})
+    return Response({'status':'Your feedback has been noted. Staff will be in touch shortly to respond.'})
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def feedbackView(request):
+    queryset = Feedback.objects.all().order_by('-id')
+    serializers = FeedbackSerializer(queryset,many=True)
+    return Response(serializers.data)

@@ -66,3 +66,12 @@ class Product(models.Model):
 class Profile(models.Model):
     username = models.CharField(max_length=200)
     img = models.FileField(db_column='IMG', max_length=200,default='placeholder.png')
+
+class Feedback(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)
+    topic = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, blank=True, null=True)
+    name = models.CharField(max_length=45, blank=True, null=True)
+    email = models.CharField(db_column='Email', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    phone = models.CharField(db_column='Phone', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    des = models.CharField(db_column='Des', max_length=500, blank=True, null=True)  # Field name made lowercase.

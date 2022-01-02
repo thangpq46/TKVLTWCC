@@ -18,6 +18,7 @@
       <NuxtLink to="/login">Login</NuxtLink>
       <NuxtLink to="/register">Register</NuxtLink>
     </div>
+    <div><NuxtLink to="/feedback">Phản hồi</NuxtLink></div>
   </nav>
 </template>
 <script>

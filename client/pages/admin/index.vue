@@ -1,12 +1,11 @@
 <template>
   <div>
-    <NuxtLink to="/admin/">Quản Lý đơn Hàng</NuxtLink>
-    <NuxtLink to="/admin/products">Quản Lý Sản Phẩm</NuxtLink>
-    <NuxtLink to="/admin/products/add">Them San Pham</NuxtLink>
+    <AdminHeader />
     <div v-for="order in orders" :key="order.orderstatus">
       <span>{{ order.orderid }}</span>
       <span>{{ order.orderdate }}</span>
       <span>{{ order.username }}</span>
+      <span>{{ order.orderaddress }}</span>
       <div v-for="details in order.details" :key="details.productname">
         <span>{{ details.productname }}</span>
         <span>{{ details.img }}</span>
@@ -16,10 +15,15 @@
       <span v-if="order.orderstatus === 'done'"
         ><span>Đã Hoàn Tất</span></span
       >
+      <span v-else-if="order.orderstatus === 'canceled'">
+        <span>Đã Hủy</span>
+      </span>
       <span v-else
         ><button @click="changeorderstatus(order.orderid)">
           {{ order.orderstatus }}
-        </button></span
+        </button>
+        <button @click="changeorderstatus(order.orderid,true)">Hủy</button>
+        </span
       >
     </div>
   </div>
@@ -31,7 +35,10 @@ export default {
     return { orders }
   },
   methods: {
-    async changeorderstatus(OrderID) {
+    async changeorderstatus(OrderID,cancelorder=false) {
+      if (cancelorder){
+        await this.$axios.delete('adminorderview/', { data: { orderid: OrderID } })
+      }
       await this.$axios.post('adminorderview/', {
         orderid: OrderID,
       })
