@@ -49,6 +49,7 @@ class Orders(models.Model):
     orderaddress = models.CharField(db_column='OrderAddress', max_length=500, blank=True, null=True)  # Field name made lowercase.
     username = models.CharField(max_length=200)
     orderdate = models.DateField(db_column='OrderDate', blank=True,default=dateupdate())  # Field name made lowercase.
+    total = models.IntegerField(db_column='Total',blank=True, null=True)
     orderstatus = models.CharField(db_column='OrderStatus', max_length=200, blank=True, null=True)  # Field name made lowercase.
 
 

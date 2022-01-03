@@ -10,7 +10,7 @@
     <input v-model="searchinput" type="text">
     <a :href="filterproducts(searchinput)"><button type="button" class="">Search</button></a>
     <div v-if="$auth.loggedIn">
-      <div>Wellcome {{ $auth.user.first_name }}{{$auth.user.last_name }}<img :src="$auth.user.img"></div>
+      <NuxtLink to="/user"><div>Wellcome {{ $auth.user.first_name }} {{$auth.user.last_name }}<img :src="$auth.user.img"></div></NuxtLink>
       <NuxtLink to="/cart">Cart {{ $auth.user.productincart}}</NuxtLink>
       <NuxtLink to="/user/orders"><button>Đơn Hàng của bạn</button></NuxtLink>
       <NuxtLink to="/"><button @click="logout">Logout</button></NuxtLink>

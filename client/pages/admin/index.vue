@@ -1,11 +1,13 @@
 <template>
   <div>
     <AdminHeader />
+    {{orders}}
     <div v-for="order in orders" :key="order.orderstatus">
       <span>{{ order.orderid }}</span>
       <span>{{ order.orderdate }}</span>
       <span>{{ order.username }}</span>
       <span>{{ order.orderaddress }}</span>
+      <span>{{ order.total }}</span>
       <div v-for="details in order.details" :key="details.productname">
         <span>{{ details.productname }}</span>
         <span>{{ details.img }}</span>

@@ -5,6 +5,7 @@
                 <span>Mã Đơn :</span> <span>{{order.orderid}}</span>
                 <span>Địa Chỉ :</span><span>{{order.orderaddress}}</span>
                 <span>Ngày đặt :</span><span>{{order.orderdate}}</span>
+                <span>Tổng Tiền đơn hàng :</span><span>{{order.total}}</span>
                 <span v-if="order.orderstatus ==='pending'">Trạng thái đơn hàng : Đang chờ xử lí</span>
                 <span v-else-if="order.orderstatus ==='confirmed'">Trạng thái đơn hàng : Đã Xác Nhận</span>
                 <span v-else-if="order.orderstatus ==='done'">Trạng thái đơn hàng : Đã Hoàn Tất</span>

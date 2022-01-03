@@ -41,7 +41,6 @@ def validpassword(p):
     
 @api_view(['POST'])
 def register(request):
-    print(request.data)
     user = request.data.get('user')
     username= user['username']
     email= user['email']
@@ -125,7 +124,15 @@ def OrdersView(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def userview(request):
+    token= request.META.get('HTTP_AUTHORIZATION').split(' ')[1]
     username= request.user.username
+    try:
+        print('this line run')
+        print(request.user)
+        print('is this run?')
+    except:
+        print('ops. jump to this')
+        pass
     queryset = User.objects.filter(username=username)
     serializers = UserSerializer(queryset,many=True)
     user =serializers.data[0]
@@ -138,12 +145,9 @@ def userview(request):
     queryimg = Profile.objects.filter(username=username)
     try:
         profile = ProfileSerializer(queryimg,many=True,context={'request': request}).data[0]
-        print("this line run smoth")
     except:
         Profile.objects.create(username=username)
         profile = ProfileSerializer(queryimg,many=True,context={'request': request}).data[0]
-        print("ops it jump to this")
-    print (profile['img'])
     user["img"] = profile['img']
     response = Response()
     response.data ={
@@ -187,7 +191,8 @@ def logout(request):
 def Checkout(request):
     address=request.data.get('address')
     username= request.user.username
-    order= Orders.objects.create(username=username,orderstatus='pending',orderaddress=address)
+    total =Cart.objects.get(username=username).carttotal
+    order= Orders.objects.create(username=username,orderstatus='pending',orderaddress=address,total=total)
     queryset = Cartdetails.objects.filter(username=username)
     items = CartdetailsSerializer(queryset,many=True).data
     for item in items:
@@ -227,7 +232,11 @@ def AdminOrderView(request):
         queryset=Orders.objects.all().order_by('-orderdate')
         orders = OrdersSerializer(queryset,many=True).data
         for order in orders:
-            queryset= Orderdetails.objects.filter(orderid=order['orderid'])
+            orderid =order['orderid']
+            user = User.objects.get(username=order['username'])
+            name = user.first_name + ' ' + user.last_name
+            order['username']= name
+            queryset= Orderdetails.objects.filter(orderid=orderid)
             details = OrderdetailsSerializer(queryset,many=True).data
             order['details']=details
         return Response(orders)
