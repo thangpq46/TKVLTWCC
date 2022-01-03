@@ -1,6 +1,7 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user
 from rest_framework.reverse import reverse
 import requests
+from rest_framework_simplejwt import *
 import re
 from django.contrib.auth.models import User
 from rest_framework.response import Response
@@ -14,12 +15,12 @@ def login(request):
     username= request.data.get('username')
     password= request.data.get('password')
     if not User.objects.filter(username=username).exists() or User.objects.filter(email=username).exists():
-        raise  exceptions.AuthenticationFailed('User does not exist')
+        raise  exceptions.AuthenticationFailed()
     if User.objects.filter(email=username).exists():
         username=User.objects.get(email=username).username
     user = authenticate(username=username, password=password)
     if user is None:
-        raise exceptions.AuthenticationFailed({ 'error' :'Incorred password'})
+        raise exceptions.AuthenticationFailed()
     token_endpoint = reverse(viewname='token_obtain_pair',request=request)
     token = requests.post(token_endpoint, data=request.data).json()
     response = Response()
@@ -79,11 +80,9 @@ def ProductbycodeView(request,code):
 
 @api_view(['POST'])    
 def Productfilter(request):
-    print(request.data)
     filterdata = "%" +request.data.get('filterdata')+"%" # %9%
     try:
         queryset=Product.objects.raw('''SELECT * FROM core_product WHERE Name LIKE %s''',[filterdata])
-        print(queryset)
         serializers=ProductSerializer(queryset,many=True,context={'request': request}) 
         return Response(serializers.data)
     except:
@@ -96,7 +95,6 @@ def Addtocart(request):
     username= request.user.username
     queryset = Product.objects.filter(name=productname)
     serializers=ProductSerializer(queryset,many=True,context={'request': request}).data[0]
-    print(serializers)
     price = float(serializers['price'])
     img = serializers['img']
     haveincart = Cartdetails.objects.filter(productname=productname,username=username)
@@ -106,7 +104,6 @@ def Addtocart(request):
         carttotal=Cart.objects.get(username=username).carttotal+price
         Cart.objects.filter(username=username).update(carttotal=carttotal)
     return Response()
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -125,15 +122,7 @@ def OrdersView(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def userview(request):
-    token= request.META.get('HTTP_AUTHORIZATION').split(' ')[1]
-    username= request.user.username
-    try:
-        print('this line run')
-        print(request.user)
-        print('is this run?')
-    except:
-        print('ops. jump to this')
-        pass
+    username= request.user
     queryset = User.objects.filter(username=username)
     serializers = UserSerializer(queryset,many=True)
     user =serializers.data[0]
@@ -159,7 +148,6 @@ def userview(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def changecartdetails(request):
-    print(request.data)
     data = request.data.get('data')
     productname = data['productname']
     operator = data['operator']
@@ -185,7 +173,6 @@ def changecartdetails(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout(request):
-    logout(request)
     return Response()
 
 @api_view(['POST'])
@@ -255,39 +242,39 @@ def AdminOrderView(request):
         return Response()
     elif request.method == 'DELETE':
         orderid = request.data.get('orderid')
-        print(orderid)
         Orders.objects.filter(orderid=orderid).update(orderstatus='canceled')
         return Response({'status':'cancel success'})
 
-@api_view(['POST'])
+@api_view(['POST','DELETE','PUT'])
 @permission_classes([IsAdminUser])
 def productadminview(request):
-    trequest = request.data.get('type')
-    productcode = request.data.get('productcode')
-    name = request.data.get('name')
-    price = request.data.get('price')
-    description = request.data.get('description')
-    stock = request.data.get('stock')
-    brandid = request.data.get('brandname')
-    brand = Brand.objects.get(id=brandid)
-    img = request.data.get('img')
-    productid = request.data.get('id')
-    if trequest == 'x':
+    if request.method == 'DELETE':
+        productid = request.data.get('productid')
         Product.objects.filter(id=productid).delete()
-        return Response({'status':'delete sucessful'})
-    if trequest == '+':
-        if (Product.objects.filter(productcode=productcode).exists()) == False and (Product.objects.filter(name=name).exists())==False :
-            Product.objects.create(productcode=productcode, name=name,price=price, description=description,img=img, brandname=brand,stock=stock)
-            return Response({'status': 'success'})
-        else:
-            return Response({'status': 'Productcode or Productname alrealdy exist'})
-    elif trequest == 'e':
-        return Response({'status':'well done'})
- 
+        return Response()
+    else:
+        productcode = request.data.get('productcode')
+        name = request.data.get('name')
+        price = request.data.get('price')
+        description = request.data.get('description')
+        stock = request.data.get('stock')
+        brandid = request.data.get('brandname')
+        brand = Brand.objects.get(id=brandid)
+        img = request.data.get('img')
+        productid = request.data.get('id')
+        if request.method == 'PUT':
+            if (Product.objects.filter(productcode=productcode).exists()) == False and (Product.objects.filter(name=name).exists())==False :
+                Product.objects.create(productcode=productcode, name=name,price=price, description=description,img=img, brandname=brand,stock=stock)
+                return Response()
+            else:
+                return Response({'status': 'Productcode or Productname alrealdy exist'})
+        if request.method == 'POST':
+            print(img)
+            Product.objects.filter(id=productid).update(productcode=productcode,name=name,price=price,img=img,description=description,stock=stock,brandname=brand)
+            return Response()
 @api_view(['POST'])
 def submitFeed(request):
     feedback = request.data.get('feedback')
-    print(feedback)
     try:
         Feedback.objects.create(topic=feedback['topic'],title=feedback['title'],name=feedback['name'],email=feedback['email'],phone=feedback['phone'],des=feedback['des'])
     except:

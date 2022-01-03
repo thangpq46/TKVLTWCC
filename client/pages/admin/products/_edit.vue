@@ -37,7 +37,6 @@ export default {
         description: '',
         brand: '',
       },
-      type: 'e',
       preview: '',
     }
   },
@@ -66,31 +65,18 @@ export default {
       for (const data in this.product) {
         formData.append(data, this.product[data]);
       }
-      formData.append('type', this.type);
       try {
-        
-        const response = await this.$axios.$post("/productadminview/",formData,config);
-        console.log(response);
+        await this.$axios.$post("/productadminview/",formData,config);
+        this.$router.push('/admin/products/'+this.product.productcode)
       } catch (e) {
-        console.log(e);
       }
     },
     async deleteProduct() {
-      const config = {
-        headers: { "content-type": "multipart/form-data" }
-      };
-      const formData = new FormData();
-      for (const data in this.product) {
-        formData.append(data, this.product[data]);
-      }
-      this.type = 'x';
-      formData.append('type', this.type);
       try {
-        await this.$axios.$post("/productadminview/",
-          formData,config
+        await this.$axios.$delete("/productadminview/",
+          { data: { productid: this.product.id } }
         );
         this.$router.push('/admin/products/');
-        this.$router.refresh();
       } catch (e) {
         console.log(e);
       }

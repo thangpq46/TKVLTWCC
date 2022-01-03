@@ -71,11 +71,9 @@ export default {
         formData.append(data, this.product[data]);
       }
       try {
-        
-        const response = await this.$axios.$post("/productadminview/",formData,config);
-        console.log(response);
+        await this.$axios.$put("/productadminview/",formData,config);
+        this.$router.push('/admin/products/')
       } catch (e) {
-        console.log(e);
       }
     }
   }
