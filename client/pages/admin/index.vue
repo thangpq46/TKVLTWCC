@@ -8,11 +8,11 @@
       <span>{{ order.username }}</span>
       <span>{{ order.orderaddress }}</span>
       <span>{{ order.total }}</span>
-      <div v-for="details in order.details" :key="details.productname">
-        <span>{{ details.productname }}</span>
-        <span>{{ details.img }}</span>
-        <span>{{ details.quantity }}</span>
-        <span>{{ details.price }}</span>
+      <div v-for="detail in order.details" :key="detail.productname">
+        <span>{{ detail.productname }}</span>
+        <span><img :src="detail.img"></span>
+        <span>{{ detail.quantity }}</span>
+        <span>{{ detail.price }}</span>
       </div>
       <span v-if="order.orderstatus === 'done'"
         ><span>Đã Hoàn Tất</span></span

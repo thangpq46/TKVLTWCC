@@ -79,12 +79,12 @@ def ProductbycodeView(request,code):
 
 @api_view(['POST'])    
 def Productfilter(request):
-    filterdata = "%" +request.data.get('filterdata')+"%"
+    print(request.data)
+    filterdata = "%" +request.data.get('filterdata')+"%" # %9%
     try:
         queryset=Product.objects.raw('''SELECT * FROM core_product WHERE Name LIKE %s''',[filterdata])
         print(queryset)
-        serializers=ProductSerializer(queryset,many=True,context={'request': request})
-        print(serializers.data) 
+        serializers=ProductSerializer(queryset,many=True,context={'request': request}) 
         return Response(serializers.data)
     except:
         return Response({'status':'failed'})
@@ -92,10 +92,11 @@ def Productfilter(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def Addtocart(request):
-    productname= request.data.get('productname')
+    productname= request.data.get('productname')   
     username= request.user.username
     queryset = Product.objects.filter(name=productname)
     serializers=ProductSerializer(queryset,many=True,context={'request': request}).data[0]
+    print(serializers)
     price = float(serializers['price'])
     img = serializers['img']
     haveincart = Cartdetails.objects.filter(productname=productname,username=username)
@@ -104,7 +105,7 @@ def Addtocart(request):
         Cartdetails.objects.create(productname=productname,price=price,username=username,img=img)
         carttotal=Cart.objects.get(username=username).carttotal+price
         Cart.objects.filter(username=username).update(carttotal=carttotal)
-    return Response({'status': 'success'})
+    return Response()
 
 
 @api_view(['GET'])
@@ -184,6 +185,7 @@ def changecartdetails(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout(request):
+    logout(request)
     return Response()
 
 @api_view(['POST'])
@@ -196,7 +198,8 @@ def Checkout(request):
     queryset = Cartdetails.objects.filter(username=username)
     items = CartdetailsSerializer(queryset,many=True).data
     for item in items:
-        Orderdetails.objects.create(orderid=order.orderid,productname=item['productname'],quantity=item['quantity'],price=item['price'])
+        imgurl = Product.objects.get(name=item['productname']).img
+        Orderdetails.objects.create(orderid=order.orderid,productname=item['productname'],quantity=item['quantity'],price=item['price'],img=imgurl)
     Cartdetails.objects.filter(username=username).delete()
     Cart.objects.filter(username=username).update(carttotal=0)
     return Response({'status': 'pending'})
@@ -237,7 +240,7 @@ def AdminOrderView(request):
             name = user.first_name + ' ' + user.last_name
             order['username']= name
             queryset= Orderdetails.objects.filter(orderid=orderid)
-            details = OrderdetailsSerializer(queryset,many=True).data
+            details = OrderdetailsSerializer(queryset,many=True,context={'request': request}).data
             order['details']=details
         return Response(orders)
     elif request.method == 'POST':
@@ -284,6 +287,7 @@ def productadminview(request):
 @api_view(['POST'])
 def submitFeed(request):
     feedback = request.data.get('feedback')
+    print(feedback)
     try:
         Feedback.objects.create(topic=feedback['topic'],title=feedback['title'],name=feedback['name'],email=feedback['email'],phone=feedback['phone'],des=feedback['des'])
     except:
