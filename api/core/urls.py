@@ -25,4 +25,6 @@ urlpatterns = [
     path('submitfeed/',submitFeed,name='submitfeedback'),
     path('feedview/',feedbackView,name='feedview'),
     path('userorders/',userorders,name='userorders'),
+    path('updateuser/',updateuser,name='updateuser'),
+    path('changepass/',changepassword,name='changepass'),
 ]

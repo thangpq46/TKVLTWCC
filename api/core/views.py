@@ -33,9 +33,6 @@ def login(request):
     return response
 
 def validpassword(p):
-    print('---------')
-    print(p)
-    print('---------')
     if (len(p)<6 or len(p)>12) or not re.search("[a-z]",p) or not re.search("[0-9]",p) or not re.search("[A-Z]",p) :
         return False
     return True
@@ -311,3 +308,36 @@ def userorders(request):
         orderid =request.data.get('orderid')
         Orders.objects.filter(orderid=orderid).update(orderstatus='canceled')
         return Response({'status':'Your order has been successfully canceled'})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def updateuser(request):
+    user = request.data
+    print('##')
+    print(user)
+    print('##')
+    User.objects.filter(username=user['username']).update(email=user['email'],first_name=user['first_name'],last_name=user['last_name'])
+    Profile.objects.create(username='temp',img=user['img'])
+    Profile.objects.filter(username='temp').delete()
+    Profile.objects.filter(username=user['username']).update(img=user['img'])
+    return Response()
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def changepassword(request):
+    print('is this piece of shit run?')
+    print(request.data)
+    username =request.user
+    new_password = request.data.get('new_password')
+    rnew_password = request.data.get('rnew_password')
+    user = User.objects.get(username=username)
+    if user.check_password(request.data.get('password')) ==False:
+        return Response({'status':'Incorrect Password'})
+    else:
+        if not new_password == rnew_password:
+            return Response({'status':'New Password not match'})
+        elif not validpassword(new_password):
+            return Response({'status':'Password not strong enough'})
+    user.set_password(new_password)
+    user.save()
+    return Response({'status':'success'})
