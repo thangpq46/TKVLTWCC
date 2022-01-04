@@ -70,7 +70,7 @@
           :key="brand.brandname"
           class="col-4 col-lg-2"
         >
-          <a :href="filterproducts(brand.brandname)">
+          <a :href="filterproducts(brand.brandname)">   <!-- truyền vào bộ  -->
             <img class="img-fluid" :src="brand.img" />
           </a>
         </div>

@@ -269,8 +269,11 @@ def productadminview(request):
             else:
                 return Response({'status': 'Productcode or Productname alrealdy exist'})
         if request.method == 'POST':
-            print(img)
-            Product.objects.filter(id=productid).update(productcode=productcode,name=name,price=price,img=img,description=description,stock=stock,brandname=brand)
+            print('---------')
+            print(request.FILES['img'])
+            print('---------')
+            Product.objects.filter(id=productid).delete()
+            Product.objects.create(id=productid,productcode=productcode,name=name,price=price,img=img,description=description,stock=stock,brandname=brand)
             return Response()
 @api_view(['POST'])
 def submitFeed(request):

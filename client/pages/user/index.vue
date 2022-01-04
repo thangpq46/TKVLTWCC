@@ -1,19 +1,25 @@
 <template>
   <div>
-    <div><input type="text"  :value='$auth.user.username' disabled></div>
+    {{user.user}}
+    <div>{{user.username}}</div>
+    <button v-if="isediting===false" type="button" @click="usereditinfo('useremail')">Chỉnh sửa</button>
+    <button v-else type="button" @click="usereditinfo('useremail')">Lưu</button>
     <div>
-      <input id="useremail" type="email" :value='$auth.user.email' disabled>
-      <button type="button" @click="usereditinfo('useremail')">Chỉnh sửa</button>
+      <input id="useremail" type="email" v-model='user.email' :disabled="isediting">
+      
+      
     </div>
+    
   </div>
 </template>
 <script>
 
 export default{
-// asyncData({ auth}){
-//     const user = auth.user;
-//     return user
-// },
+  async asyncData({$axios}){
+    let user = await $axios.$get('/user/')
+    user = user.user
+    return { user}
+  },
   data() {
     return {
       user: {
@@ -23,12 +29,14 @@ export default{
         email: '',
         img: '',
       },
+      isediting: false,
     }
   },
     methods: {
-        usereditinfo(typeinfo){
-            document.getElementById(typeinfo).disabled = false;
-        }
+        usereditinfo(){
+            this.isediting = !this.isediting;
+        },
+
     }
 }
 </script>
