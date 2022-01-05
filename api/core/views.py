@@ -313,10 +313,9 @@ def userorders(request):
 @permission_classes([IsAuthenticated])
 def updateuser(request):
     user = request.data
-    print('##')
-    print(user)
-    print('##')
     User.objects.filter(username=user['username']).update(email=user['email'],first_name=user['first_name'],last_name=user['last_name'])
+    if type(user['img']) == type(''):
+        return Response()
     Profile.objects.create(username='temp',img=user['img'])
     Profile.objects.filter(username='temp').delete()
     Profile.objects.filter(username=user['username']).update(img=user['img'])
