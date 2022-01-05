@@ -301,7 +301,7 @@ def userorders(request):
         else:
             for order in orders:
                 queryset =Orderdetails.objects.filter(orderid=order['orderid'])
-                details =OrderdetailsSerializer(queryset,many=True).data 
+                details =OrderdetailsSerializer(queryset,many=True,context={'request': request}).data 
                 order['details'] = details
             return Response(orders)
     else:

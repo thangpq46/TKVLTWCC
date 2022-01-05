@@ -13,6 +13,7 @@
                 <button v-if="order.orderstatus ==='pending'" type="button" @click="cancelorder(order.orderid)">Hủy đơn</button>
             </div>
             <div v-for="detail in order.details" :key="detail.productname">
+                {{detail}}
                 <span>{{detail.productname}}</span>
                 <img :src="detail.img">
                 <span>{{detail.quantity}}</span>
