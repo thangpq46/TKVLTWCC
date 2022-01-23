@@ -1,109 +1,52 @@
 <template>
   <div>
-    <Header />
-    <div class="app flex-row align-items-center">
-      <div class="container">
-        <b-row class="justify-content-center login">
-          <b-col md="6">
-            <b-card-group>
-              <b-card no-body class="p-4">
-                <b-card-body>
-                  <h1>Register</h1>
-                  <Notification v-if="status" :message="status" />
-                  <p class="text-muted">Register your account</p>
-                  <b-input-group class="mb-3">
-                    <b-input-group-prepend>
-                      <b-input-group-text
-                        ><i class="icon-user"></i
-                      ></b-input-group-text>
-                    </b-input-group-prepend>
-                    <input
-                      v-model="user.username"
-                      type="text"
-                      class="form-control"
-                      placeholder="username"
-                    />
-                  </b-input-group>
-                  <b-input-group class="mb-3">
-                    <b-input-group-prepend>
-                      <b-input-group-text
-                        ><i class="icon-user"></i
-                      ></b-input-group-text>
-                    </b-input-group-prepend>
-                    <input
-                      v-model="user.email"
-                      type="email"
-                      class="form-control"
-                      placeholder="email"
-                    />
-                  </b-input-group>
-                  <b-input-group class="mb-3">
-                    <b-input-group-prepend>
-                      <b-input-group-text
-                        ><i class="icon-user"></i
-                      ></b-input-group-text>
-                    </b-input-group-prepend>
-                    <input
-                      v-model="user.first_name"
-                      type="text"
-                      class="form-control"
-                      placeholder="Firstname"
-                    />
-                  </b-input-group>
-
-                  <b-input-group class="mb-3">
-                    <b-input-group-prepend>
-                      <b-input-group-text
-                        ><i class="icon-user"></i
-                      ></b-input-group-text>
-                    </b-input-group-prepend>
-                    <input
-                      v-model="user.last_name"
-                      type="text"
-                      class="form-control"
-                      placeholder="Lastname"
-                    />
-                  </b-input-group>
-
-                  <b-input-group class="mb-4">
-                    <b-input-group-prepend>
-                      <b-input-group-text
-                        ><i class="icon-lock"></i
-                      ></b-input-group-text>
-                    </b-input-group-prepend>
-                    <input
-                      v-model="user.password"
-                      type="password"
-                      class="form-control"
-                      placeholder="Password"
-                    />
-                  </b-input-group>
-                  <b-input-group class="mb-4">
-                    <b-input-group-prepend>
-                      <b-input-group-text
-                        ><i class="icon-lock"></i
-                      ></b-input-group-text>
-                    </b-input-group-prepend>
-                    <input
-                      v-model="user.rpassword"
-                      type="password"
-                      class="form-control"
-                      placeholder="retype Password"
-                    />
-                  </b-input-group>
-
-                  <b-row>
-                    <b-col cols="6">
-                      <b-button variant="primary" class="px-4" @click="register()"
-                        >register</b-button
-                      >
-                    </b-col>
-                  </b-row>
-                </b-card-body>
-              </b-card>
-            </b-card-group>
-          </b-col>
-        </b-row>
+    <div class="login-form-body">
+      <div class="login-box">
+        <h2>Register</h2>
+        <Notification v-if="status" :message="status" />
+        <form>
+          <div class="user-box">
+            <input v-model="user.username" type="text" name="" required />
+            <label>Username</label>
+          </div>
+          <div class="user-box">
+            <input v-model="user.email" type="email" name="" required />
+            <label>Email</label>
+          </div>
+          <div class="user-box">
+            <input v-model="user.first_name" type="text" name="" required />
+            <label>Firstname</label>
+          </div>
+          <div class="user-box">
+            <input v-model="user.last_name" type="text" name="" required />
+            <label>Lastname</label>
+          </div>
+          <div class="user-box">
+            <input
+              v-model="user.password"
+              type="password"
+              name=""
+              required=""
+            />
+            <label>Password</label>
+          </div>
+          <div class="user-box">
+            <input
+              v-model="user.rpassword"
+              type="password"
+              name=""
+              required=""
+            />
+            <label>Retype Password</label>
+          </div>
+          <a @click="register()">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            Submit
+          </a>
+        </form>
       </div>
     </div>
   </div>
@@ -122,12 +65,12 @@ export default {
   data() {
     return {
       user: {
-        username: 'admin',
-        password: '@t04062001',
-        email: 'pqt4621@gmail.com',
-        first_name: 'Phan Quang',
-        last_name:'Thắng',
-        rpassword:'@t04062001',
+        username: '',
+        password: '',
+        email: '',
+        first_name: '',
+        last_name: '',
+        rpassword: '',
       },
       status: null,
     }
@@ -136,11 +79,11 @@ export default {
   methods: {
     async register() {
       const response = await this.$axios.$post('register/', {
-        user: this.user
+        user: this.user,
       })
       this.$nuxt.refresh()
       this.status = response.status
-      if(this.status ==='register success'){
+      if (this.status === 'register success') {
         this.$router.push('/login/')
       }
     },

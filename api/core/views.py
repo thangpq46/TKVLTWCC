@@ -46,6 +46,8 @@ def register(request):
     lastname= user['last_name']
     password= user['password']
     rpassword= user['rpassword']
+    if username == '' or email == '' or password == '' or rpassword == '':
+        return Response({'status':'you must enter all fields'})
     if User.objects.filter(username=username).exists():
         return Response({'status':'user alrealdy exist'})
     elif User.objects.filter(email=email).exists():
@@ -184,6 +186,8 @@ def Checkout(request):
     for item in items:
         imgurl = Product.objects.get(name=item['productname']).img
         Orderdetails.objects.create(orderid=order.orderid,productname=item['productname'],quantity=item['quantity'],price=item['price'],img=imgurl)
+        product=Product.objects.get(name=item['productname'])
+        Product.objects.filter(name=item['productname']).update(stock=(product.stock-item['quantity']))
     Cartdetails.objects.filter(username=username).delete()
     Cart.objects.filter(username=username).update(carttotal=0)
     return Response({'status': 'pending'})

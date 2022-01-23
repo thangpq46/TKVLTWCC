@@ -1,54 +1,66 @@
 <template>
-    <div>
-          <section class="container g-0 bg-light">
-      <div class="row g-0">
-        <div
-          v-for="product in filterproducts"
-          :key="product.productid"
-          class="col-6 col-lg-3"
-        >
-          <div class="product">
-            <div class="img-thumbnail">
-              <img class="img-fluid" :src="product.img" />
+  
+  <div>
+    <Header :brands="brands"></Header>
+    <BannerTop />
+    <Brand :brands="brands"></Brand>
+    <div class="section">
+      <div class="container">
+        <div class="row">
+          <div
+            v-for="product in filterproducts"
+            :key="product.productcode"
+            class="col-lg-3 col-md-4 col-6 items-product mg-bt-30"
+          >
+            <div class="product-img">
+              <a :href="getproductsurl(product.productcode)">
+                <img
+                  :src="product.img"
+                  alt=""
+                  class="img-fluid rounded mx-auto d-block pd-10"
+                />
+              </a>
             </div>
-            <div class="product_title">
-              <a :href="getproductsurl(product.productcode)"
-                >{{ getsortname(product.name).name }}...</a
-              >
-            </div>
-            <div class="product_price">
+            <div class="product-info">
+              <a :href="getproductsurl(product.productcode)">
+              <h6>{{ getsortname(product.name).name }}...</h6>
+              </a>
               <span>{{ product.price }}$</span>
-            </div>
-            <div>
-              <button type="button" class="btn btn-primary add-to-cart col-12">
+              <button
+                type="button"
+                class="btn btn-danger add-to-cart col-12"
+                @click="addtocart(product.name)"
+              >
                 Mua Ngay
               </button>
             </div>
           </div>
         </div>
       </div>
-    </section>
     </div>
+    <Top-footer />
+    <Footer />
+  </div>
 </template>
 <script>
-
 export default {
-    auth: 'guest auth',
-    async asyncData({ $axios,params}) {
-        const filterproducts = await $axios.$post(`/productsfilter/`,{
-          filterdata: params.filter
-        })
-        return {filterproducts}
-    },
-    methods: {
-    getsortname(name){
-      name=name.substring(0,55)
+  auth: 'guest auth',
+  async asyncData({ $axios, params }) {
+    const filterproducts = await $axios.$post(`/productsfilter/`, {
+      filterdata: params.filter,
+    })
+    const brands = await $axios.$get('/brand/')
+    return { filterproducts, brands }
+  },
+  methods: {
+    getsortname(name) {
+      name = name.substring(0, 55)
       return { name }
     },
-    getproductsurl(productid){
-      const url = '/products/'+productid
-      return url;
+    getproductsurl(productid) {
+      const url = '/products/' + productid
+      return url
     },
-  }
+  },
 }
 </script>

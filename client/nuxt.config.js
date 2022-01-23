@@ -12,12 +12,19 @@ export default {
       { name: 'format-detection', content: 'telephone=no' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ]
+      { rel: 'stylesheet', href:'https://unpkg.com/swiper/swiper-bundle.min.css'},
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'stylesheet', href:'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css'},
+      { href: "https://cdn.lineicons.com/3.0/lineicons.css", rel:"stylesheet"},
+      { rel: 'stylesheet', href:'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css'},
+     ]
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
+    '@/static/css/style.css',
+    '@/static/css/brandstyle.css',
+    '@/static/css/loginstyle.css',
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
