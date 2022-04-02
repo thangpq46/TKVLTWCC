@@ -1,8 +1,10 @@
 from django.contrib.auth import authenticate, get_user
 from rest_framework.reverse import reverse
+from django.db.models import F
 import requests
 from rest_framework_simplejwt import *
 import re
+from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
@@ -14,21 +16,37 @@ from .models import *
 def login(request):
     username= request.data.get('username')
     password= request.data.get('password')
-    if not User.objects.filter(username=username).exists() or User.objects.filter(email=username).exists():
+    if not User.objects.filter(username=username).exists() or authenticate(username=username, password=password) is None:
         raise  exceptions.AuthenticationFailed()
-    if User.objects.filter(email=username).exists():
-        username=User.objects.get(email=username).username
-    user = authenticate(username=username, password=password)
-    if user is None:
-        raise exceptions.AuthenticationFailed()
     token_endpoint = reverse(viewname='token_obtain_pair',request=request)
     token = requests.post(token_endpoint, data=request.data).json()
-    response = Response()
+    response = Response(status=status.HTTP_200_OK)
     response.data = {
         'access': token.get('access'),
         'refresh': token.get('refresh'),
-        'username': username,
-        'status':'Login success'
+    }
+    return response
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def userview(request):
+    username= request.user
+    queryset = User.objects.filter(username=username)
+    user = UserSerializer(queryset,many=True).data[0]
+    try:
+        user['numofproducts'] = Cart.objects.get(username=username).numofproducts
+    except Cart.DoesNotExist:
+        Cart.objects.create(username=username,numofproducts=0,total=0.0)
+        user['numofproducts'] = Cart.objects.get(username=username).numofproducts
+    profilequery = Profile.objects.filter(username=username)
+    try:
+        user['img'] = ProfileSerializer(profilequery,many=True,context={'request': request}).data[0]['img']
+    except:
+        Profile.objects.create(username=username)
+        user['img'] = ProfileSerializer(profilequery,many=True,context={'request': request}).data[0]['img']
+    response = Response(status=status.HTTP_200_OK)
+    response.data ={
+        'user': user
     }
     return response
 
@@ -39,31 +57,27 @@ def validpassword(p):
     
 @api_view(['POST'])
 def register(request):
-    user = request.data.get('user')
-    username= user['username']
-    email= user['email']
-    firstname= user['first_name']
-    lastname= user['last_name']
-    password= user['password']
-    rpassword= user['rpassword']
+    userdata = request.data.get('user')
+    username= userdata['username']
+    email= userdata['email']
+    password= userdata['password']
+    rpassword= userdata['rpassword']
     if username == '' or email == '' or password == '' or rpassword == '':
-        return Response({'status':'you must enter all fields'})
-    if User.objects.filter(username=username).exists():
-        return Response({'status':'user alrealdy exist'})
-    elif User.objects.filter(email=email).exists():
-        return Response({'status':'email alrealdy exist'})
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    if User.objects.filter(username=username).exists() or User.objects.filter(email=email).exists():
+        return Response(status=status.HTTP_409_CONFLICT)
     elif validpassword(password)== False:
-        return Response({'status':'Password have length from 6-12 char.It must cointain at least 1 num, 1 lowercase and 1 uppercase.'})
+        return Response(status = status.HTTP_428_PRECONDITION_REQUIRED)
     elif rpassword !=password:
-        return Response({'status':'password not match'})
+        return Response(status=status.HTTP_510_NOT_EXTENDED)
     else:
         user = User.objects.create_user(username,email,password)
-        user.last_name = lastname
-        user.first_name = firstname
+        user.last_name = userdata['last_name']
+        user.first_name = userdata['first_name']
         user.save()
-        Cart.objects.create(username=username,carttotal=0)
+        Cart.objects.create(username=username,total=0.0)
         Profile.objects.create(username=username)
-        return Response({'status':'register success'})
+        return Response(status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
 def ProductView(request):
@@ -87,22 +101,37 @@ def Productfilter(request):
     except:
         return Response({'status':'failed'})
 
+def updateproductquantity(product,cart,operator):
+    if operator == 'x':
+        Cartdetails.objects.filter(productcode=product, cart=cart).delete()
+    elif operator == 'c':
+        Cartdetails.objects.create(cartid=cart,productcode=product,quantity=1)
+        cart.total=cart.total+product.price
+        cart.numofproducts+=1
+    else:
+        detail= Cartdetails.objects.get(productcode=product, cartid=cart)
+        if operator == '+' and detail.quantity<product.stock:
+            Cartdetails.objects.filter(productcode=product, cartid=cart).update(quantity=F('quantity')+1)
+            cart.total=cart.total+product.price
+            cart.numofproducts+=1
+        if operator == '-'and detail.quantity>1:
+            Cartdetails.objects.filter(productcode=product, cartid=cart).update(quantity=F('quantity')-1)
+            cart.total=cart.total-product.price
+            cart.numofproducts-=1
+        cart.save()
+    return
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def Addtocart(request):
-    productname= request.data.get('productname')   
-    username= request.user.username
-    queryset = Product.objects.filter(name=productname)
-    serializers=ProductSerializer(queryset,many=True,context={'request': request}).data[0]
-    price = float(serializers['price'])
-    img = serializers['img']
-    haveincart = Cartdetails.objects.filter(productname=productname,username=username)
-    serializers = CartdetailsSerializer(haveincart,many=True).data
-    if len(serializers)<1:
-        Cartdetails.objects.create(productname=productname,price=price,username=username,img=img)
-        carttotal=Cart.objects.get(username=username).carttotal+price
-        Cart.objects.filter(username=username).update(carttotal=carttotal)
-    return Response()
+    pcode= request.data.get('productcode')   
+    username= request.user
+    product = Product.objects.get(productcode=pcode)
+    cart = Cart.objects.get(username=username)
+    if len(Cartdetails.objects.filter(productcode=product,cartid=cart)) < 1: #check if exist in user's cart
+        updateproductquantity(product,cart,'c')
+    return Response(status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -118,56 +147,17 @@ def OrdersView(request):
     serializers=OrdersSerializer(queryset,many=True).data
     return Response(serializers)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def userview(request):
-    username= request.user
-    queryset = User.objects.filter(username=username)
-    serializers = UserSerializer(queryset,many=True)
-    user =serializers.data[0]
-    querycart = Cartdetails.objects.filter(username=username)
-    numofproduct = len(CartdetailsSerializer(querycart,many=True).data)
-    user["productincart"] = numofproduct
-    queryset=Cart.objects.filter(username=username)
-    cart=CartSerializer(queryset,many=True).data[0]
-    user["cart"] = cart
-    queryimg = Profile.objects.filter(username=username)
-    try:
-        profile = ProfileSerializer(queryimg,many=True,context={'request': request}).data[0]
-    except:
-        Profile.objects.create(username=username)
-        profile = ProfileSerializer(queryimg,many=True,context={'request': request}).data[0]
-    user["img"] = profile['img']
-    response = Response()
-    response.data ={
-        'user': user
-    }
-    return response
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def changecartdetails(request):
     data = request.data.get('data')
-    productname = data['productname']
+    productcode = data['productcode']
     operator = data['operator']
     username = request.user.username
-    if operator == 'x':
-        Cartdetails.objects.filter(productname=productname, username=username).delete()
-    else:
-        stock = Product.objects.get(name=productname).stock
-        price = Product.objects.get(name=productname).price
-        quantity=Cartdetails.objects.get(productname=productname,username=username).quantity
-        if operator == '+' and quantity<stock:
-            Cartdetails.objects.filter(productname=productname, username=username).update(quantity=quantity+1,price=(price*(quantity+1)))
-        if operator == '-'and quantity>1:
-            Cartdetails.objects.filter(productname=productname, username=username).update(quantity=quantity-1,price=(price*(quantity-1)))
-    queryset = Cartdetails.objects.filter(username=username)
-    items= CartdetailsSerializer(queryset,many=True).data
-    sum=0
-    for item in items:
-        sum+=item['price']
-    Cart.objects.filter(username=username).update(carttotal=sum)
-    return Response({'status':'success'})
+    product = Product.objects.get(productcode=productcode)
+    cart = Cart.objects.get(username=username)
+    updateproductquantity(product,cart,operator)
+    return Response(status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -179,17 +169,14 @@ def logout(request):
 def Checkout(request):
     address=request.data.get('address')
     username= request.user.username
-    total =Cart.objects.get(username=username).carttotal
-    order= Orders.objects.create(username=username,orderstatus='pending',orderaddress=address,total=total)
-    queryset = Cartdetails.objects.filter(username=username)
-    items = CartdetailsSerializer(queryset,many=True).data
+    cart =Cart.objects.get(username=username)
+    order= Orders.objects.create(username=username,orderstatus=0,orderaddress=address,total=cart.total)
+    items = Cartdetails.objects.filter(username=username)
     for item in items:
-        imgurl = Product.objects.get(name=item['productname']).img
-        Orderdetails.objects.create(orderid=order.orderid,productname=item['productname'],quantity=item['quantity'],price=item['price'],img=imgurl)
-        product=Product.objects.get(name=item['productname'])
-        Product.objects.filter(name=item['productname']).update(stock=(product.stock-item['quantity']))
-    Cartdetails.objects.filter(username=username).delete()
-    Cart.objects.filter(username=username).update(carttotal=0)
+        Orderdetails.objects.create(orderid=order,productcode=item,quantity=item.quantity)
+        Product.objects.get(productcode=item.productcode).update(stock=F('stock')-item.quantity)
+    Cartdetails.objects.filter(cartid=cart).delete()
+    Cart.objects.filter(username=username).update(numofproducts=0)
     return Response({'status': 'pending'})
 
 @api_view(['GET'])

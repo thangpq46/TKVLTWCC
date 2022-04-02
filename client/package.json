@@ -29,5 +29,9 @@
     "eslint-plugin-nuxt": "^2.0.0",
     "eslint-plugin-vue": "^7.12.1",
     "prettier": "^2.3.2"
-  }
+  },
+  "description": "```bash\r # install dependencies\r $ yarn install",
+  "main": ".eslintrc.js",
+  "author": "",
+  "license": "ISC"
 }

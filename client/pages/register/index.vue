@@ -78,14 +78,26 @@ export default {
 
   methods: {
     async register() {
-      const response = await this.$axios.$post('register/', {
-        user: this.user,
+      const response = await this.$axios.post('register/', {
+      user: this.user,
       })
-      this.$nuxt.refresh()
-      this.status = response.status
-      if (this.status === 'register success') {
+      if (response.status==201){
         this.$router.push('/login/')
       }
+      else if (response.status==409){
+          //trurng username or email
+      }
+      else if (response.status==428){
+          // mk qua yeu
+      }
+      else if (response.status==510){
+          //mk khong trung
+      }
+      // this.$nuxt.refresh()
+      // this.status = response.status
+      // if (this.status === 'register success') {
+      //   this.$router.push('/login/')
+      // }
     },
   },
 }

@@ -27,11 +27,6 @@ class BrandSerializer(serializers.ModelSerializer):
         model = Brand
         fields = ("id","brandname", "branddes","img")
 
-class AddressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Address
-        fields = ("username", "default_address", "shippingaddress")
-
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,7 +41,7 @@ class CartdetailsSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ("username","img")
+        fields = ("username","img","defaultaddress","phonenum")
 
 class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
