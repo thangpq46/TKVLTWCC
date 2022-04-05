@@ -78,26 +78,26 @@ export default {
 
   methods: {
     async register() {
-      const response = await this.$axios.post('register/', {
-      user: this.user,
-      })
-      if (response.status==201){
-        this.$router.push('/login/')
+      try {
+        const response = await this.$axios.post('register/', {
+          user: this.user,
+        })
+        // console.log(response.status)
+        if (response.status == 201) {
+          this.$router.push('/login/')
+        }
+      } catch (e) {
+        console.log(e.status)
+        if (e.response.status == 409) {
+          this.status = 'Username or Email already exist!'
+        } else if (e.response.status == 428) {
+          this.status = 'Password too Weak!'
+        } else if (e.response.status == 204) {
+          this.status = 'You must fill all the fields'
+        } else if (e.response.status == 510) {
+          this.status = 'Password not Match!'
+        }
       }
-      else if (response.status==409){
-          //trurng username or email
-      }
-      else if (response.status==428){
-          // mk qua yeu
-      }
-      else if (response.status==510){
-          //mk khong trung
-      }
-      // this.$nuxt.refresh()
-      // this.status = response.status
-      // if (this.status === 'register success') {
-      //   this.$router.push('/login/')
-      // }
     },
   },
 }

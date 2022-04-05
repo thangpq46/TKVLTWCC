@@ -15,7 +15,7 @@
       <button
         type="button"
         class="btn btn-primary add-to-cart col-12"
-        @click="addtocart(product.name)"
+        @click="addtocart(product.productcode)"
       >
         Mua Ngay
       </button>
@@ -41,10 +41,10 @@ export default {
       const url = '/products/' + productid
       return url
     },
-    async addtocart(ProductName) {
+    async addtocart(productcode) {
       if(this.$auth.loggedIn){
         await this.$axios.$post('addtocart/', {
-        productname: ProductName,
+        productcode: productcode,
       })
       this.$nuxt.refresh();
       this.$router.go()

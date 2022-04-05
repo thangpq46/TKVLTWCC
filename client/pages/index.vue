@@ -19,7 +19,9 @@ export default {
     const newproducts = await $axios.$get('/newproducts/')
     const instockproducts = await $axios.$get('/instockproducts/')
     const hotproducts = await $axios.$get('/hotproducts/')
+    console.log(newproducts)
     return { newproducts, instockproducts, hotproducts, brands }
+    
   },
   methods: {
     getsortname(name) {
@@ -30,10 +32,10 @@ export default {
       const url = '/products/' + productid
       return url
     },
-    async addtocart(ProductName) {
+    async addtocart(productcode) {
       if(this.$auth.loggedIn){
         await this.$axios.$post('addtocart/', {
-        productname: ProductName,
+        productcode: productcode,
       })
       this.$nuxt.refresh();
       this.$router.go()

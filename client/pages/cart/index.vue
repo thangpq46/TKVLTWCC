@@ -2,7 +2,7 @@
   <div class="bg-color-brown">
     <Header :brands="brands"></Header>
     <BannerTop />
-    <div v-if=" $auth.user.productincart === 0" class="section pd-top-20">
+    <div v-if=" $auth.user.numofproducts < 1" class="section pd-top-20">
       <div class="container">
         <div class="row align-items-center justify-content-center bd-rd-5">
 										<div class="col-11 flex-column-1 items-cart items-empty-cart">
@@ -23,7 +23,7 @@
         <div class="row justify-content-center">
           <div class="col-lg-8 col-12">
             <div
-              v-for="item in cartdetails"
+              v-for="item in cart.cartdetails"
               :key="item.productname"
               class="row align-items-center justify-content-center"
             >
@@ -42,15 +42,15 @@
                     </div>
                     <div class="cart-p-actions dp-flex align-items-center">
                       <div class="cart-p-actions-i">
-                          <i class="bi bi-dash" @click="changeitem(item.productname, '-')"></i>
+                          <i class="bi bi-dash" @click="changeitem(item.productcode, '-')"></i>
                           <span><b> {{ item.quantity }} </b></span>
-                          <i class="bi bi-plus" @click="changeitem(item.productname, '+')"></i>
+                          <i class="bi bi-plus" @click="changeitem(item.productcode, '+')"></i>
                       </div>
                       <div>
                         <button
                           type="button"
                           class="btn btn-danger"
-                          @click="changeitem(item.productname, 'x')"
+                          @click="changeitem(item.productcode, 'x')"
                         >
                           <i class="bi bi-trash delete-cart"></i>
                         </button>
@@ -77,7 +77,7 @@
                   <span>Tạm tính</span>
                   
                   <span class="font-weight-500"
-                    >{{ $auth.user.cart.carttotal }}$</span
+                    >{{cart.total }}$</span
                   >
                 </div>
                 <div class="d-flex justify-content-between">
@@ -89,7 +89,7 @@
                   <span>Tổng cộng</span>
                   <div class="">
                     <span class="font-weight-500 total-price-1"
-                      >{{ $auth.user.cart.carttotal }}$</span
+                      >{{ cart.total }}$</span
                     >
                     <span class="total-price-2">(Đã bao gồm VAT nếu có)</span>
                   </div>
@@ -115,27 +115,26 @@ import BannerTop from '../../components/BannerTop.vue'
 export default {
   components: { BannerTop },
   async asyncData({ $axios }) {
-    const cartdetails = await $axios.$get('/cart/')
+    const cart = await $axios.$get('/cart/')
     const brands = await $axios.$get('/brand/')
-    return { cartdetails, brands }
+    return { cart, brands }
   },
   data() {
     return {
       details: {
-        productname: '',
+        productcode: '',
         operator: '',
       },
     }
   },
   methods: {
-    async changeitem(ProductName, operator) {
-      this.details.productname = ProductName
+    async changeitem(productcode, operator) {
+      this.details.productcode = productcode
       this.details.operator = operator
       await this.$axios.$post('changecartdetails/', {
         data: this.details,
       })
       this.$nuxt.refresh()
-      this.$router.go()
     },
   },
 }

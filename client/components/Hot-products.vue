@@ -24,7 +24,7 @@
             </div>
             <div class="product-info">
               <a :href="getproductsurl(product.productcode)">
-              <h6>{{ getsortname(product.name).name }}...</h6>
+                <h6>{{ getsortname(product.name).name }}...</h6>
               </a>
               <span>{{ product.price }}$</span>
               <button

@@ -2,7 +2,7 @@
   <div class="login-form-body">
     <div class="login-box">
       <h2>Login</h2>
-      <Notification v-if="error" :message="error" />
+      <Notification v-if="status" :message="status" />
       <form>
         <div class="user-box">
           <input v-model="user.username" type="text" name="" required="" />
@@ -40,7 +40,7 @@ export default {
         username: '',
         password: '',
       },
-      error: null,
+      status: null,
     }
   },
 
@@ -50,13 +50,22 @@ export default {
         const response = await this.$auth.loginWith('local', {
           data: this.user,
         })
-        this.$auth.$storage.setUniversal('username', response.data.username)
         if (this.$auth.user.is_staff) {
           this.$router.push('/admin')
         }
       } catch (e) {
-        this.error = 'Incored Username or Password'
+        console.log(e.response.status)
+        if(e.response.status==204){
+          this.status = "Please fill all fields!"
+        }
+        else if(e.response.status==404){
+          this.status = "Username does not exist!"
+        }
+        else if(e.response.status==401){
+          this.status = "Incorrect password!"
+        }
       }
+      this.$nuxt.refresh()
     },
   },
 }

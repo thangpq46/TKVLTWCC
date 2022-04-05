@@ -36,7 +36,7 @@ class CartSerializer(serializers.ModelSerializer):
 class CartdetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cartdetails
-        fields = ("productname","img", "quantity", "price","username")
+        fields = ("productcode", "quantity")
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:

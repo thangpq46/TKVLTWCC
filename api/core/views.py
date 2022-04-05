@@ -16,8 +16,12 @@ from .models import *
 def login(request):
     username= request.data.get('username')
     password= request.data.get('password')
-    if not User.objects.filter(username=username).exists() or authenticate(username=username, password=password) is None:
-        raise  exceptions.AuthenticationFailed()
+    if username=='' or password=='':
+        return  Response(status=status.HTTP_204_NO_CONTENT)
+    if not User.objects.filter(username=username).exists():
+        return  Response(status=status.HTTP_404_NOT_FOUND)
+    if authenticate(username=username, password=password) is None:
+        return  Response(status=status.HTTP_401_UNAUTHORIZED)
     token_endpoint = reverse(viewname='token_obtain_pair',request=request)
     token = requests.post(token_endpoint, data=request.data).json()
     response = Response(status=status.HTTP_200_OK)
@@ -103,11 +107,10 @@ def Productfilter(request):
 
 def updateproductquantity(product,cart,operator):
     if operator == 'x':
-        Cartdetails.objects.filter(productcode=product, cart=cart).delete()
+        Cartdetails.objects.filter(productcode=product, cartid=cart).delete()
+        Cart.objects.filter(cartid=cart.cartid).update(numofproducts=F('numofproducts')-1)
     elif operator == 'c':
-        Cartdetails.objects.create(cartid=cart,productcode=product,quantity=1)
-        cart.total=cart.total+product.price
-        cart.numofproducts+=1
+        Cartdetails.objects.create(cartid=cart,productcode=product,quantity=0)
     else:
         detail= Cartdetails.objects.get(productcode=product, cartid=cart)
         if operator == '+' and detail.quantity<product.stock:
@@ -131,15 +134,29 @@ def Addtocart(request):
     cart = Cart.objects.get(username=username)
     if len(Cartdetails.objects.filter(productcode=product,cartid=cart)) < 1: #check if exist in user's cart
         updateproductquantity(product,cart,'c')
+    updateproductquantity(product,cart,'+')
     return Response(status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def CartdetailsView(request):
-    username = request.user.username
-    queryset = Cartdetails.objects.filter(username=username)
-    serializer = CartdetailsSerializer(queryset,many=True)
-    return Response(serializer.data)
+    username = request.user
+    cart = Cart.objects.get(username=username)
+    queryset = Cartdetails.objects.filter(cartid=cart)
+    serializer = CartdetailsSerializer(queryset,many=True).data
+    for s in serializer:
+        Product.objects.get(id=s['productcode']).img
+        query = Product.objects.filter(id=s['productcode'])
+        product =ProductSerializer(query,many=True,context={'request': request}).data[0]
+        s['productname']= product['name']
+        s['img'] = product['img']
+        s['price'] = s['quantity']*product['price']
+    response = Response(status=status.HTTP_200_OK)
+    response.data = {
+        'cartdetails':serializer,
+        'total':cart.total
+    }
+    return response
 
 @api_view(['GET'])
 def OrdersView(request):
@@ -152,9 +169,12 @@ def OrdersView(request):
 def changecartdetails(request):
     data = request.data.get('data')
     productcode = data['productcode']
+    print('hihi')
+    print(productcode)
+    print('hihi')
     operator = data['operator']
-    username = request.user.username
-    product = Product.objects.get(productcode=productcode)
+    username = request.user
+    product = Product.objects.get(id=productcode)
     cart = Cart.objects.get(username=username)
     updateproductquantity(product,cart,operator)
     return Response(status=status.HTTP_200_OK)
@@ -315,7 +335,6 @@ def updateuser(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def changepassword(request):
-    print('is this piece of shit run?')
     print(request.data)
     username =request.user
     new_password = request.data.get('new_password')

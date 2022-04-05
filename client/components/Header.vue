@@ -127,6 +127,7 @@
               <img v-if="$auth.loggedIn" class="preview-img" :src="$auth.user.img" width="40px" height="40" />
               <i v-else class="fas fa-user-circle"></i>
               <h5 v-if="$auth.loggedIn">
+                <div>{{$auth.user}}</div>
                 <a href="http://localhost:3000/user" class="no-decoration" style="color: #fff"
                   >TÀI KHOẢN</a
                 >
@@ -186,7 +187,7 @@
               <a href="/cart">
                 <i class="fas fa-cart-arrow-down" style="position: relative">
                   <span class="countproductincart"
-                    >{{ $auth.user.productincart }}
+                    >{{ $auth.user.numofproducts }}
                   </span>
                 </i>
               </a>
