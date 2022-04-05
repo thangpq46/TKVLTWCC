@@ -1,20 +1,22 @@
 <template>
-  <div class="product">
-    <div class="img-thumbnail">
-      <img class="img-fluid" :src="product.img" />
+  <div>
+    <div class="product-img">
+      <a :href="getproductsurl(product.productcode)">
+        <img
+          :src="product.img"
+          alt=""
+          class="img-fluid rounded mx-auto d-block pd-10"
+        />
+      </a>
     </div>
-    <div class="product_title">
-      <a :href="getproductsurl(product.productcode)"
-        >{{ getsortname(product.name).name }}...</a
-      >
-    </div>
-    <div class="product_price">
+    <div class="product-info">
+      <a :href="getproductsurl(product.productcode)">
+        <h6>{{ getsortname(product.name).name }}...</h6>
+      </a>
       <span>{{ product.price }}$</span>
-    </div>
-    <div>
       <button
         type="button"
-        class="btn btn-primary add-to-cart col-12"
+        class="btn btn-danger add-to-cart col-12"
         @click="addtocart(product.productcode)"
       >
         Mua Ngay
@@ -27,10 +29,10 @@ export default {
   auth: 'guest auth',
   props: {
     product: {
-      type:Object,
-      required:true,
-      default: null
-    }
+      type: Object,
+      required: true,
+      default: null,
+    },
   },
   methods: {
     getsortname(name) {
@@ -42,15 +44,14 @@ export default {
       return url
     },
     async addtocart(productcode) {
-      if(this.$auth.loggedIn){
+      if (this.$auth.loggedIn) {
         await this.$axios.$post('addtocart/', {
-        productcode: productcode,
-      })
-      this.$nuxt.refresh();
-      this.$router.go()
-      }
-      else{
-        this.$router.push('/login/');
+          productcode: productcode,
+        })
+        this.$nuxt.refresh()
+        this.$router.go()
+      } else {
+        this.$router.push('/login/')
       }
     },
   },
