@@ -27,4 +27,5 @@ urlpatterns = [
     path('userorders/',userorders,name='userorders'),
     path('updateuser/',updateuser,name='updateuser'),
     path('changepass/',changepassword,name='changepass'),
+    path('get_provinces_json',get_provinces_json,name='get_provinces')
 ]

@@ -44,7 +44,7 @@
 
 <script>
 export default {
-    auth: 'guest auth',
+    auth: false,
     async asyncData({ $axios,params}) {
         const products = await $axios.$get(`/products/`)
         const brands = await $axios.$get('/brand/')

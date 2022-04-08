@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="bg-color-brown section-checkout">
-      <Header :preview="preview" :brands="brands"></Header>
+      <!-- <Header :preview="preview" :brands="brands"></Header> -->
       <BannerTop />
       <div class="section pd-top-20">
         <div class="container">
@@ -13,7 +13,7 @@
           <div class="row justify-content-center">
             <div class="col-lg-8 col-12">
               <div
-                v-for="item in cartdetails"
+                v-for="item in cart.cartdetails"
                 :key="item.productname"
                 class="row align-items-center justify-content-center"
               >
@@ -76,6 +76,27 @@
                     <span class="font-weight-500">{{ $auth.user.email }}</span>
                   </div>
                   <div class="justify-content-between">
+                    <select v-model="province">
+                      <option 
+                        v-for="(adr, index) in address"
+                        :key="adr.name"
+                        :value=index
+                      >{{adr.name}}</option>
+                    </select>
+                    <select v-model="distri">
+                      <option 
+                        v-for="(district,index) in address[province].districts"
+                        :key="district.name"
+                        :value=index
+                      >{{district.name}}</option>
+                    </select>
+                    <select v-model="ward">
+                      <option 
+                        v-for="(ward,index) in address[province].districts[distri].wards"
+                        :key="ward.name"
+                        :value=index
+                      >{{ward.name}}</option>
+                    </select>
                     <span class="font-weight-500"
                       ><input
                         class="form-control no-bd"
@@ -90,7 +111,7 @@
                     <span>Tổng</span>
                     <div class="">
                       <span class="font-weight-500 total-price-1"
-                        >{{ $auth.user.cart.carttotal }}$</span
+                        >{{ cart.total }}$</span
                       >
                     </div>
                   </div>
@@ -118,21 +139,38 @@
 export default {
   auth: 'auth',
   async asyncData({ $axios }) {
-    const cartdetails = await $axios.$get('/cart/')
+    const cart = await $axios.$get('/cart/')
     const brands = await $axios.$get('/brand/')
-    return { cartdetails, brands }
+    const address = await $axios.$get('/get_provinces_json')
+    return { cart, brands,address }
   },
   data() {
     return {
       shippingaddress: '',
+      province: 0,
+      distri:0,
+      ward:0
     }
   },
   methods: {
     async checkout() {
-      await this.$axios.$post('checkout/', {
-        address: this.shippingaddress,
-      })
-      this.$router.push('/')
+      const userprovince = this.address[this.province];
+      const userdistrict = userprovince.districts[this.distri];
+      const userward = userdistrict.wards[this.ward]
+      const address =this.shippingaddress+ ', '+ userprovince.name + ', '+userdistrict.name + ', '+userward.name;
+      try{
+        const response= await this.$axios.post('checkout/', {
+        address: address,
+        })
+        if(response.status==202){
+          // must haave nofi success on place order
+          this.$router.push('/')
+        }
+      }
+      catch(e){
+        console.log(e.response)
+      }
+      // this.$router.push('/')
     },
   },
 }

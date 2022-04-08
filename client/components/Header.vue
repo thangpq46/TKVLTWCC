@@ -127,7 +127,6 @@
               <img v-if="$auth.loggedIn" class="preview-img" :src="$auth.user.img" width="40px" height="40" />
               <i v-else class="fas fa-user-circle"></i>
               <h5 v-if="$auth.loggedIn">
-                <div>{{$auth.user}}</div>
                 <a href="http://localhost:3000/user" class="no-decoration" style="color: #fff"
                   >TÀI KHOẢN</a
                 >
@@ -320,6 +319,10 @@
 <script>
 export default {
   auth: 'guest ',
+    async asyncData({ $axios }) {
+    const brands = await $axios.$get('/brand/')
+    return { brands }
+  },
   props: ['brands' ],
   data() {
     return {
@@ -337,7 +340,6 @@ export default {
     async logout() {
       await this.$auth.logout(/* .... */)
       window.localStorage.clear()
-      // console.log($cookies.keys());
     },
     nologin() {
       alert('Bạn hiện tại chưa đăng nhập!')

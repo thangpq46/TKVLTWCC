@@ -31,7 +31,7 @@ class Product(models.Model):
 class Cart(models.Model):
     cartid = models.AutoField(db_column='CartID', primary_key=True)  # Field name made lowercase.
     username = models.CharField(max_length=150)
-    numofproducts = models.IntegerField(blank=True, null=True)
+    numofproducts = models.IntegerField(blank=True, default=0)
     total = models.FloatField(db_column='Total',default=0.0)
     cartnum = models.CharField(db_column='Cartnum', max_length=45, blank=True, null=True)  # Field name made lowercase.
     typecart = models.CharField(max_length=45, blank=True, null=True)
@@ -44,7 +44,7 @@ class Cartdetails(models.Model):
     deltailsid = models.AutoField(db_column='DeltailsID', primary_key=True)  # Field name made lowercase.
     cartid = models.ForeignKey(Cart, models.CASCADE, db_column='CartID',default=-1)  # Field name made lowercase.
     productcode = models.ForeignKey(Product, models.CASCADE, db_column='ProductCode',null=True) # Field name made lowercase.# Field name made lowercase.
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(default=1)
 
     class Meta:
         db_table = 'core_cartdetails'

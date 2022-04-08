@@ -11,7 +11,9 @@ from rest_framework.decorators import api_view,permission_classes
 from rest_framework.permissions import *
 from .serializers import *
 from .models import *
-
+import orjson
+from vietnam_provinces import NESTED_DIVISIONS_JSON_PATH
+from vietnam_provinces.enums import ProvinceEnum, ProvinceDEnum, DistrictEnum, DistrictDEnum
 @api_view(['POST'])
 def login(request):
     username= request.data.get('username')
@@ -49,10 +51,21 @@ def userview(request):
         Profile.objects.create(username=username)
         user['img'] = ProfileSerializer(profilequery,many=True,context={'request': request}).data[0]['img']
     response = Response(status=status.HTTP_200_OK)
+    # for provided in ProvinceEnum:
+    #     print(provided.value.name)
+    # province_code = '624'
+    # province = DistrictEnum[f'D_{province_code}'].value
+    # print(province)
+    province =orjson.loads(NESTED_DIVISIONS_JSON_PATH.read_bytes())
     response.data ={
         'user': user
     }
     return response
+
+@api_view(['GET'])
+def get_provinces_json(request):
+    provinces =orjson.loads(NESTED_DIVISIONS_JSON_PATH.read_bytes())
+    return Response(provinces)
 
 def validpassword(p):
     if (len(p)<6 or len(p)>12) or not re.search("[a-z]",p) or not re.search("[0-9]",p) or not re.search("[A-Z]",p) :
@@ -79,7 +92,7 @@ def register(request):
         user.last_name = userdata['last_name']
         user.first_name = userdata['first_name']
         user.save()
-        Cart.objects.create(username=username,total=0.0)
+        Cart.objects.create(username=username)
         Profile.objects.create(username=username)
         return Response(status=status.HTTP_201_CREATED)
 
@@ -103,24 +116,23 @@ def Productfilter(request):
         serializers=ProductSerializer(queryset,many=True,context={'request': request}) 
         return Response(serializers.data)
     except:
-        return Response({'status':'failed'})
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 def updateproductquantity(product,cart,operator):
     if operator == 'x':
         Cartdetails.objects.filter(productcode=product, cartid=cart).delete()
         Cart.objects.filter(cartid=cart.cartid).update(numofproducts=F('numofproducts')-1)
     elif operator == 'c':
-        Cartdetails.objects.create(cartid=cart,productcode=product,quantity=0)
+        Cartdetails.objects.create(cartid=cart,productcode=product,quantity=1)
+        Cart.objects.filter(cartid=cart.cartid).update(numofproducts=F('numofproducts')+1)
     else:
         detail= Cartdetails.objects.get(productcode=product, cartid=cart)
         if operator == '+' and detail.quantity<product.stock:
             Cartdetails.objects.filter(productcode=product, cartid=cart).update(quantity=F('quantity')+1)
             cart.total=cart.total+product.price
-            cart.numofproducts+=1
         if operator == '-'and detail.quantity>1:
             Cartdetails.objects.filter(productcode=product, cartid=cart).update(quantity=F('quantity')-1)
             cart.total=cart.total-product.price
-            cart.numofproducts-=1
         cart.save()
     return
 
@@ -133,8 +145,8 @@ def Addtocart(request):
     product = Product.objects.get(productcode=pcode)
     cart = Cart.objects.get(username=username)
     if len(Cartdetails.objects.filter(productcode=product,cartid=cart)) < 1: #check if exist in user's cart
+        # Cartdetails.objects.create(productcode=product,cartid=cart)
         updateproductquantity(product,cart,'c')
-    updateproductquantity(product,cart,'+')
     return Response(status=status.HTTP_200_OK)
 
 @api_view(['GET'])
@@ -169,9 +181,6 @@ def OrdersView(request):
 def changecartdetails(request):
     data = request.data.get('data')
     productcode = data['productcode']
-    print('hihi')
-    print(productcode)
-    print('hihi')
     operator = data['operator']
     username = request.user
     product = Product.objects.get(id=productcode)
@@ -188,16 +197,16 @@ def logout(request):
 @permission_classes([IsAuthenticated])
 def Checkout(request):
     address=request.data.get('address')
-    username= request.user.username
+    username= request.user
     cart =Cart.objects.get(username=username)
-    order= Orders.objects.create(username=username,orderstatus=0,orderaddress=address,total=cart.total)
-    items = Cartdetails.objects.filter(username=username)
+    order= Orders.objects.create(username=username,orderaddress=address,total=cart.total)
+    items = Cartdetails.objects.filter(cartid=cart)
     for item in items:
-        Orderdetails.objects.create(orderid=order,productcode=item,quantity=item.quantity)
-        Product.objects.get(productcode=item.productcode).update(stock=F('stock')-item.quantity)
+        Orderdetails.objects.create(orderid=order,productcode=item.productcode,quantity=item.quantity)
+        Product.objects.filter(productcode=item.productcode.productcode).update(stock=F('stock')-item.quantity)
     Cartdetails.objects.filter(cartid=cart).delete()
     Cart.objects.filter(username=username).update(numofproducts=0)
-    return Response({'status': 'pending'})
+    return Response(status=status.HTTP_202_ACCEPTED)
 
 @api_view(['GET'])
 def NewProductView(request):
@@ -277,9 +286,6 @@ def productadminview(request):
             else:
                 return Response({'status': 'Productcode or Productname alrealdy exist'})
         if request.method == 'POST':
-            print('---------')
-            print(request.FILES['img'])
-            print('---------')
             Product.objects.filter(id=productid).delete()
             Product.objects.create(id=productid,productcode=productcode,name=name,price=price,img=img,description=description,stock=stock,brandname=brand)
             return Response()
