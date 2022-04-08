@@ -51,12 +51,6 @@ def userview(request):
         Profile.objects.create(username=username)
         user['img'] = ProfileSerializer(profilequery,many=True,context={'request': request}).data[0]['img']
     response = Response(status=status.HTTP_200_OK)
-    # for provided in ProvinceEnum:
-    #     print(provided.value.name)
-    # province_code = '624'
-    # province = DistrictEnum[f'D_{province_code}'].value
-    # print(province)
-    province =orjson.loads(NESTED_DIVISIONS_JSON_PATH.read_bytes())
     response.data ={
         'user': user
     }
@@ -244,9 +238,13 @@ def AdminOrderView(request):
             name = user.first_name + ' ' + user.last_name
             order['username']= name
             queryset= Orderdetails.objects.filter(orderid=orderid)
-            details = OrderdetailsSerializer(queryset,many=True,context={'request': request}).data
+            details = OrderdetailsSerializer(queryset,many=True).data
+            for d in details:
+                print('-----------')
+                print(d['productcode'])
+                print('-----------')
             order['details']=details
-        return Response(orders)
+        return Response(orders,status=status.HTTP_200_OK)
     elif request.method == 'POST':
         orderid = request.data.get('orderid')
         order = Orders.objects.get(orderid=orderid)

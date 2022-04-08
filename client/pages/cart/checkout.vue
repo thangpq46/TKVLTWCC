@@ -157,7 +157,7 @@ export default {
       const userprovince = this.address[this.province];
       const userdistrict = userprovince.districts[this.distri];
       const userward = userdistrict.wards[this.ward]
-      const address =this.shippingaddress+ ', '+ userprovince.name + ', '+userdistrict.name + ', '+userward.name;
+      const address =this.shippingaddress + ', '+userward.name + ', '+userdistrict.name+ ', '+ userprovince.name ;
       try{
         const response= await this.$axios.post('checkout/', {
         address: address,
