@@ -13,7 +13,6 @@ from .serializers import *
 from .models import *
 import orjson
 from vietnam_provinces import NESTED_DIVISIONS_JSON_PATH
-from vietnam_provinces.enums import ProvinceEnum, ProvinceDEnum, DistrictEnum, DistrictDEnum
 @api_view(['POST'])
 def login(request):
     username= request.data.get('username')
@@ -45,11 +44,13 @@ def userview(request):
         Cart.objects.create(username=username,numofproducts=0,total=0.0)
         user['numofproducts'] = Cart.objects.get(username=username).numofproducts
     profilequery = Profile.objects.filter(username=username)
+    profileseri=ProfileSerializer(profilequery,many=True,context={'request': request}).data
     try:
-        user['img'] = ProfileSerializer(profilequery,many=True,context={'request': request}).data[0]['img']
+        user['img'] = profileseri[0]['img']
     except:
         Profile.objects.create(username=username)
-        user['img'] = ProfileSerializer(profilequery,many=True,context={'request': request}).data[0]['img']
+        user['img'] = profileseri[0]['img']
+    user['phonenum']=profileseri[0]['phonenum']
     response = Response(status=status.HTTP_200_OK)
     response.data ={
         'user': user
@@ -151,8 +152,8 @@ def CartdetailsView(request):
     queryset = Cartdetails.objects.filter(cartid=cart)
     serializer = CartdetailsSerializer(queryset,many=True).data
     for s in serializer:
-        Product.objects.get(id=s['productcode']).img
-        query = Product.objects.filter(id=s['productcode'])
+        Product.objects.get(productid=s['productcode']).img
+        query = Product.objects.filter(productid=s['productcode'])
         product =ProductSerializer(query,many=True,context={'request': request}).data[0]
         s['productname']= product['name']
         s['img'] = product['img']
@@ -177,7 +178,7 @@ def changecartdetails(request):
     productcode = data['productcode']
     operator = data['operator']
     username = request.user
-    product = Product.objects.get(id=productcode)
+    product = Product.objects.get(productid=productcode)
     cart = Cart.objects.get(username=username)
     updateproductquantity(product,cart,operator)
     return Response(status=status.HTTP_200_OK)
@@ -230,43 +231,42 @@ def BrandView(request):
 @permission_classes([IsAdminUser])
 def AdminOrderView(request):
     if request.method == 'GET':
-        queryset=Orders.objects.all().order_by('-orderdate')
+        queryset=Orders.objects.all().order_by('-orderid')
         orders = OrdersSerializer(queryset,many=True).data
         for order in orders:
             orderid =order['orderid']
             user = User.objects.get(username=order['username'])
-            name = user.first_name + ' ' + user.last_name
-            order['username']= name
+            order['userphonenum']=Profile.objects.get(username=user.username).phonenum
+            order['username']= user.first_name + ' ' + user.last_name
             queryset= Orderdetails.objects.filter(orderid=orderid)
             details = OrderdetailsSerializer(queryset,many=True).data
             for d in details:
-                print('-----------')
-                print(d['productcode'])
-                print('-----------')
+                query = Product.objects.filter(productid=d['productcode'])
+                product = ProductSerializer(query,many=True,context={'request': request}).data[0]
+                d['price'] = product['price']
+                d['intomoney']= d['price']*d['quantity']
+                d['img']=product['img']
             order['details']=details
         return Response(orders,status=status.HTTP_200_OK)
     elif request.method == 'POST':
         orderid = request.data.get('orderid')
         order = Orders.objects.get(orderid=orderid)
-        if order.orderstatus == 'pending':
-            order.orderstatus = 'confirmed'
-            order.save()
-        elif order.orderstatus == 'confirmed':
-            order.orderstatus = 'done'
-            order.save()
-        return Response()
+        order.orderstatus+=1
+        order.save()
+        return Response(status=status.HTTP_202_ACCEPTED)
     elif request.method == 'DELETE':
         orderid = request.data.get('orderid')
-        Orders.objects.filter(orderid=orderid).update(orderstatus='canceled')
-        return Response({'status':'cancel success'})
+        Orders.objects.filter(orderid=orderid).update(orderstatus=-1)
+        return Response(status=status.HTTP_200_OK)
 
 @api_view(['POST','DELETE','PUT'])
 @permission_classes([IsAdminUser])
 def productadminview(request):
+    productid = request.data.get('productid')
     if request.method == 'DELETE':
-        productid = request.data.get('productid')
-        Product.objects.filter(id=productid).delete()
-        return Response()
+        Product.objects.filter(productid=productid).delete()
+        # need to write trigger to delete order and cart contain this product
+        return Response(status=status.HTTP_202_ACCEPTED)
     else:
         productcode = request.data.get('productcode')
         name = request.data.get('name')
@@ -276,25 +276,26 @@ def productadminview(request):
         brandid = request.data.get('brandname')
         brand = Brand.objects.get(id=brandid)
         img = request.data.get('img')
-        productid = request.data.get('id')
         if request.method == 'PUT':
-            if (Product.objects.filter(productcode=productcode).exists()) == False and (Product.objects.filter(name=name).exists())==False :
+            if not Product.objects.filter(productcode=productcode).exists() and not Product.objects.filter(name=name).exists() :
                 Product.objects.create(productcode=productcode, name=name,price=price, description=description,img=img, brandname=brand,stock=stock)
-                return Response()
+                return Response(status=status.HTTP_201_CREATED)
             else:
-                return Response({'status': 'Productcode or Productname alrealdy exist'})
+                return Response(status=status.HTTP_409_CONFLICT)
         if request.method == 'POST':
-            Product.objects.filter(id=productid).delete()
-            Product.objects.create(id=productid,productcode=productcode,name=name,price=price,img=img,description=description,stock=stock,brandname=brand)
-            return Response()
+            if(type(img)!=str):
+                temp = Profile.objects.create(username=request.user,img=img)
+                temp.delete()
+            Product.objects.filter(productid=productid).update(productcode=productcode,name=name,price=price,description=description,img=img,stock=stock,brandname=brand)
+            return Response(status=status.HTTP_202_ACCEPTED)
 @api_view(['POST'])
 def submitFeed(request):
     feedback = request.data.get('feedback')
     try:
         Feedback.objects.create(topic=feedback['topic'],title=feedback['title'],name=feedback['name'],email=feedback['email'],phone=feedback['phone'],des=feedback['des'])
     except:
-        return Response({'status':'An error occurred while sending data. please try again later'})
-    return Response({'status':'Your feedback has been noted. Staff will be in touch shortly to respond.'})
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_202_ACCEPTED)
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
@@ -328,11 +329,12 @@ def userorders(request):
 @permission_classes([IsAuthenticated])
 def updateuser(request):
     user = request.data
-    User.objects.filter(username=user['username']).update(email=user['email'],first_name=user['first_name'],last_name=user['last_name'])
-    if type(user['img']) == type(''):
+    User.objects.filter(username=request.user).update(email=user['email'],first_name=user['first_name'],last_name=user['last_name'])
+    Profile.objects.filter(username=request.user).update(phonenum=user['phonenum'])
+    if type(user['img']) == str:
         return Response()
-    Profile.objects.create(username='temp',img=user['img'])
-    Profile.objects.filter(username='temp').delete()
+    temp =Profile.objects.create(username='temp',img=user['img'])
+    temp.delete()
     Profile.objects.filter(username=user['username']).update(img=user['img'])
     return Response()
 

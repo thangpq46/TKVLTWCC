@@ -62,9 +62,17 @@
                   <td>Email</td>
                   <td>
                     <input
-                      
                       class="form-control"
                       type="email" v-model="user.email" :disabled="!isediting"
+                    />
+                  </td>
+                </tr>
+                                <tr>
+                  <td>Phone</td>
+                  <td>
+                    <input
+                      class="form-control"
+                      type="email" v-model="user.phonenum" :disabled="!isediting"
                     />
                   </td>
                 </tr>
@@ -171,6 +179,7 @@ export default {
         first_name: '',
         last_name: '',
         email: '',
+        phonenum:'',
         img: '',
       },
       password: '',

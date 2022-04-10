@@ -15,7 +15,7 @@ class Brand(models.Model):
         db_table = 'core_brand'
 
 class Product(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    productid = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     productcode = models.CharField(db_column='ProductCode', max_length=200, blank=True, null=True)  # Field name made lowercase.
     name = models.CharField(db_column='Name', max_length=200)  # Field name made lowercase.
     price = models.FloatField(db_column='Price')  # Field name made lowercase.
@@ -82,8 +82,6 @@ class Orderdetails(models.Model):
 
     class Meta:
         db_table = 'core_orderdetails'
-
-
 
 class Profile(models.Model):
     username = models.CharField(max_length=200)

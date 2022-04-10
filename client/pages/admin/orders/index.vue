@@ -31,9 +31,13 @@
                       </td>
                     </tr>
                     <tr>
-                      <td>Tài khoản</td>
+                      <td>Tên Người Đặt</td>
                       <td colspan="3">
                         {{ order.username }}
+                      </td>
+                      <td>Số Điện Thoại</td>
+                      <td colspan="3">
+                        {{ order.userphonenum }}
                       </td>
                     </tr>
                     <tr>
@@ -47,6 +51,7 @@
                       <th>Giá:</th>
                       <th>Số lượng</th>
                       <th>Hình ảnh</th>
+                      <th>Thành Tiền</th>
                     </tr>
                     <tr
                       v-for="details in order.details"
@@ -69,31 +74,32 @@
                           />
                         </a>
                       </th>
+                      <th>{{details.intomoney }}</th>
                     </tr>
                     <tr>
-                      <th>Tổng giá:</th>
+                      <th>Tổng :</th>
                       <th colspan="2">{{ order.total }}$</th>
                       <th>
                         <span
                           class="text-success"
-                          v-if="order.orderstatus === 'done'"
+                          v-if="order.orderstatus === 2"
                         >
                           Đã hoàn tất
                         </span>
                         <span
                           class="text-danger"
-                          v-else-if="order.orderstatus === 'canceled'"
+                          v-else-if="order.orderstatus === -1"
                         >
                           Đã hủy
                         </span>
                         <span v-else
-                          ><button v-if="order.orderstatus === 'pending'"
+                          ><button v-if="order.orderstatus === 0"
                             class="btn btn-success"
                             @click="changeorderstatus(order.orderid)"
                           >
                             Xác nhận đơn hàng
                           </button>
-                          <button v-if="order.orderstatus === 'confirmed'"
+                          <button v-if="order.orderstatus === 1"
                             class="btn btn-success"
                             @click="changeorderstatus(order.orderid)"
                           >
@@ -128,13 +134,22 @@ export default {
   methods: {
     async changeorderstatus(OrderID, cancelorder = false) {
       if (cancelorder) {
-        await this.$axios.delete('adminorderview/', {
+        const response= await this.$axios.delete('adminorderview/', {
           data: { orderid: OrderID },
         })
+        if(response.status==202){
+          //nofi success delete
+        }
       }
-      await this.$axios.post('adminorderview/', {
+      else{
+        const response= await this.$axios.post('adminorderview/', {
         orderid: OrderID,
       })
+        if(response.status==200){
+          //nofi change status 
+        }
+      }
+      
       this.$router.go()
     },
   },

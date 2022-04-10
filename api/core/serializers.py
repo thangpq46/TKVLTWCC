@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ("id","productcode", "name", "price", "img", "description","stock","createdate","brandname")
+        fields = ("productid","productcode", "name", "price", "img", "description","stock","createdate","brandname")
 
 class OrdersSerializer(serializers.ModelSerializer):
     class Meta:

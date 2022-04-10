@@ -1,5 +1,6 @@
 <template>
   <div>
+    <div>{{product}}</div>
     <Header-admin></Header-admin>
     <div class="section bg-color-brown">
       <div class="container-fluid">
@@ -100,8 +101,8 @@
                         <tr>
                           <td></td>
                           <td>
-                            <button class="btn btn-success" @click="editProduct">Change</button>
-                            <button class="btn btn-danger" @click="deleteProduct">Delete</button>
+                            <button class="btn btn-success" @click="editProduct(product)">Change</button>
+                            <button class="btn btn-danger" @click="deleteProduct(product.productid)">Delete</button>
                           </td>
                         </tr>
                       </table>
@@ -130,15 +131,6 @@ export default {
   },
   data() {
     return {
-      product: {
-        id:'',
-        productcode: '',
-        name: '',
-        price: '',
-        img: '',
-        description: '',
-        brand: '',
-      },
       preview: '',
     }
   },
@@ -159,13 +151,14 @@ export default {
       };
       reader.readAsDataURL(file);
     },
-    async editProduct() {
+    async editProduct(product) {
       const config = {
         headers: { "content-type": "multipart/form-data" }
       };
       const formData = new FormData();
-      for (const data in this.product) {
-        formData.append(data, this.product[data]);
+      console.log(product)
+      for (const data in product) {
+        formData.append(data,product[data]);
       }
       try {
         await this.$axios.$post("/productadminview/",formData,config);
@@ -173,12 +166,12 @@ export default {
       } catch (e) {
       }
     },
-    async deleteProduct() {
+    async deleteProduct(productid) {
       try {
         await this.$axios.$delete("/productadminview/",
-          { data: { productid: this.product.id } }
+          { data: { productid: productid } }
         );
-        this.$router.push('/admin/products/');
+        // this.$router.push('/admin/products/');
       } catch (e) {
         console.log(e);
       }
