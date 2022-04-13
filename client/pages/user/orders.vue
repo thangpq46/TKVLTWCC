@@ -2,7 +2,7 @@
   <div class="bg-color-brown">
     <Header :brands="brands"></Header>
     <BannerTop />
-    <div class="section pd-top-20 ">
+    <div class="section pd-top-20">
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-11 no-pd">
@@ -18,7 +18,7 @@
               <table class="table align-middle table-bordered">
                 <thead>
                   <tr>
-                    <th colspan="4">ĐƠN HÀNG {{ order.orderid }}</th>
+                    <th colspan="4"># {{ order.orderid }}</th>
                   </tr>
                 </thead>
                 <tr>
@@ -32,6 +32,10 @@
                   <td colspan="3">
                     {{ order.username }}
                   </td>
+                  <td>SĐT</td>
+                  <td colspan="3">
+                    {{ order.phonenum }}
+                  </td>
                 </tr>
                 <tr>
                   <td>Địa chỉ</td>
@@ -44,6 +48,7 @@
                   <th>Giá:</th>
                   <th>Số lượng</th>
                   <th>Hình ảnh</th>
+                  <th>Thành tiền</th>
                 </tr>
                 <tr v-for="details in order.details" :key="details.productname">
                   <td class="align-middle">
@@ -63,24 +68,32 @@
                       />
                     </a>
                   </th>
+                  <th class="align-middle">
+                    {{ details.intomoney }}
+                  </th>
                 </tr>
                 <tr>
                   <th>Tổng giá:</th>
                   <th colspan="2">{{ order.total }}$</th>
                   <th>
-                    <span v-if="order.orderstatus === 'pending'" class="btn btn-warning"
+                    <span v-if="order.orderstatus === 0" class="btn btn-warning"
                       >Đang chờ xử lí</span
                     >
-                    <span v-else-if="order.orderstatus === 'confirmed'" class="btn btn-success"
+                    <span
+                      v-else-if="order.orderstatus === 1"
+                      class="btn btn-success"
                       >Đã Xác Nhận</span
                     >
-                    <span v-else-if="order.orderstatus === 'done'" class="btn btn-success"
+                    <span
+                      v-else-if="order.orderstatus === 2"
+                      class="btn btn-success"
                       >Đã Hoàn Tất</span
                     >
                     <span v-else class="btn btn-danger">Đã Hủy</span>
                     <button
-                      v-if="order.orderstatus === 'pending'"
-                      type="button" class="btn btn-danger"
+                      v-if="order.orderstatus === 0"
+                      type="button"
+                      class="btn btn-danger"
                       @click="cancelorder(order.orderid)"
                     >
                       Hủy đơn
@@ -95,7 +108,6 @@
     </div>
     <Top-footer />
     <Footer />
-
   </div>
 </template>
 <script>
@@ -103,21 +115,20 @@ export default {
   props: {
     brand: {
       type: Object,
-      required: true,
       default: null,
     },
   },
   async asyncData({ $axios }) {
     const orders = await $axios.$get('/userorders/')
     const brands = await $axios.$get('/brand/')
-    return { orders , brands }
+    return { orders, brands }
   },
   methods: {
     async cancelorder(id) {
       const response = await this.$axios.$post('/userorders/', {
         orderid: id,
       })
-      console.log(response)
+      this.$router.go()
     },
   },
 }

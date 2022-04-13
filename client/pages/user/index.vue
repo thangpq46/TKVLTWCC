@@ -219,9 +219,16 @@ export default {
         formData.append(data, this.user[data])
       }
       try {
-        await this.$axios.$post('/updateuser/', formData, config)
+        const respons= await this.$axios.$post('/updateuser/', formData, config)
         this.usereditinfo()
-      } catch (e) {}
+        if (respons.status ==202){
+          this.status="success"
+        }
+      } catch (e) {
+        if(e.response.status ==409){
+          this.status="This Email already used!"
+        }
+      }
     },
     async changepassword() {
       const config = {
@@ -231,8 +238,24 @@ export default {
       formData.append('password', this.password)
       formData.append('new_password', this.new_password)
       formData.append('rnew_password', this.rnew_password)
-      const response = await this.$axios.$post('/changepass/', formData, config)
-      this.status = response.status
+      try{
+        const response = await this.$axios.post('/changepass/', formData, config)
+        if(response.status==202){
+          this.status="success"     //add nofi
+        }
+      }
+      catch (e) {
+        if(e.response.status==400){
+          this.status="Incorrect Password"  
+        }
+        else if (e.response.status ==412){
+          this.status="Password not strong enough"  
+        }
+        else{
+          this.status="new password no match"
+        }
+      }
+      this.$nuxt.refresh()
     },
   },
 }

@@ -70,7 +70,6 @@ export default {
     const newproducts = await $axios.$get('/newproducts/')
     const instockproducts = await $axios.$get('/instockproducts/')
     const hotproducts = await $axios.$get('/hotproducts/')
-    console.log(newproducts)
     return { newproducts, instockproducts, hotproducts, brands }
   },
   methods: {

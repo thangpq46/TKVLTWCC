@@ -16,7 +16,7 @@
                 <div class="user-adm user">
                   <div class="d-column">
                     <a href="">USERS</a>
-                    <span>1</span>
+                    <span>{{dashboard.numusers}}</span>
                   </div>
                   <div>
                     <a href="">
@@ -29,7 +29,7 @@
                 <div class="product-adm user">
                   <div class="d-column">
                     <NuxtLink to="/admin/products">PRODUCTS</NuxtLink>
-                    <span>2</span>
+                    <span>{{dashboard.numproducts}}</span>
                   </div>
                   <div>
                     <a href="">
@@ -42,7 +42,7 @@
                 <div class="order-adm user">
                   <div class="d-column">
                     <a href="/admin/orders">ORDERS</a>
-                    <span>3</span>
+                    <span>{{dashboard.numorders}}</span>
                   </div>
                   <div>
                     <a href="">
@@ -55,7 +55,7 @@
                 <div class="messages-adm user">
                   <div class="d-column">
                     <NuxtLink to="/admin/feedback">Feedback</NuxtLink>
-                    <span>4</span>
+                    <span>{{dashboard.numfeedback}}</span>
                   </div>
                   <div>
                     <a href="">
@@ -65,6 +65,7 @@
                 </div>
               </div>
             </div>
+            <div class="row">You have {{dashboard.pendingorders}} pending orders</div>
           </div>
         </div>
       </div>
@@ -80,7 +81,8 @@ export default {
   },
   async asyncData({ $axios }) {
     const orders = await $axios.$get('/adminorderview/')
-    return { orders }
+    const dashboard = await $axios.$get('/dashboard')
+    return { orders,dashboard }
   },
   methods: {
     async changeorderstatus(OrderID, cancelorder = false) {

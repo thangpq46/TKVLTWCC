@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, get_user
+from django.contrib.auth import authenticate
 from rest_framework.reverse import reverse
 from django.db.models import F
 import requests
@@ -38,11 +38,8 @@ def userview(request):
     username= request.user
     queryset = User.objects.filter(username=username)
     user = UserSerializer(queryset,many=True).data[0]
-    try:
-        user['numofproducts'] = Cart.objects.get(username=username).numofproducts
-    except Cart.DoesNotExist:
-        Cart.objects.create(username=username,numofproducts=0,total=0.0)
-        user['numofproducts'] = Cart.objects.get(username=username).numofproducts
+    cart,created = Cart.objects.get_or_create(username=username)
+    user['numofproducts']=cart.numofproducts
     profilequery = Profile.objects.filter(username=username)
     profileseri=ProfileSerializer(profilequery,many=True,context={'request': request}).data
     try:
@@ -309,50 +306,69 @@ def feedbackView(request):
 @permission_classes([IsAuthenticated])
 def userorders(request):
     if request.method == 'GET':
-        username = request.user.username
+        username = request.user
         queryset =Orders.objects.filter(username= username).order_by('-orderdate')
         orders =OrdersSerializer(queryset,many=True).data
-        if len(orders) < 0:
-            return Response()
-        else:
-            for order in orders:
-                queryset =Orderdetails.objects.filter(orderid=order['orderid'])
-                details =OrderdetailsSerializer(queryset,many=True,context={'request': request}).data 
-                order['details'] = details
-            return Response(orders)
+        for order in orders:
+            user = User.objects.get(username=username)
+            order['username'] = user.first_name+" "+user.last_name
+            order['phonenum'] = Profile.objects.get(username=username).phonenum
+            queryset =Orderdetails.objects.filter(orderid=order['orderid'])
+            details =OrderdetailsSerializer(queryset,many=True,context={'request': request}).data 
+            for d in details:
+                pquery = Product.objects.filter(productid=int(d['productcode']))
+                product = ProductSerializer(pquery,many=True,context={'request': request}).data[0]
+                d['productname'] = product['name']
+                d['price'] =product['price']
+                d['img']= product['img']
+                d['intomoney']= product['price']*d['quantity']
+            order['details'] = details
+        return Response(orders)
     else:
         orderid =request.data.get('orderid')
-        Orders.objects.filter(orderid=orderid).update(orderstatus='canceled')
-        return Response({'status':'Your order has been successfully canceled'})
+        Orders.objects.filter(orderid=orderid).update(orderstatus=-1)
+        return Response(status=status.HTTP_202_ACCEPTED)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def updateuser(request):
     user = request.data
-    User.objects.filter(username=request.user).update(email=user['email'],first_name=user['first_name'],last_name=user['last_name'])
+    User.objects.filter(username=request.user).update(first_name=user['first_name'],last_name=user['last_name'])
+    if User.objects.filter(email=user['email']).exists() and User.objects.get(username=request.user).email != user['email']:
+        return Response(status=status.HTTP_409_CONFLICT)
     Profile.objects.filter(username=request.user).update(phonenum=user['phonenum'])
     if type(user['img']) == str:
-        return Response()
+        return Response(status=status.HTTP_202_ACCEPTED)
     temp =Profile.objects.create(username='temp',img=user['img'])
     temp.delete()
     Profile.objects.filter(username=user['username']).update(img=user['img'])
-    return Response()
+    return Response(status=status.HTTP_202_ACCEPTED)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def changepassword(request):
-    print(request.data)
     username =request.user
     new_password = request.data.get('new_password')
     rnew_password = request.data.get('rnew_password')
     user = User.objects.get(username=username)
-    if user.check_password(request.data.get('password')) ==False:
-        return Response({'status':'Incorrect Password'})
+    if not user.check_password(request.data.get('password')):
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     else:
         if not new_password == rnew_password:
-            return Response({'status':'New Password not match'})
+            return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
         elif not validpassword(new_password):
-            return Response({'status':'Password not strong enough'})
+            return Response(status=status.HTTP_412_PRECONDITION_FAILED)
     user.set_password(new_password)
     user.save()
-    return Response({'status':'success'})
+    return Response(status=status.HTTP_202_ACCEPTED)
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def dashboard(request):
+    nusers= len(User.objects.all())
+    nproducts = len(Product.objects.all())
+    norders = len(Orders.objects.all())
+    nfeedback = len(Feedback.objects.all())
+    orderspending = len(Orders.objects.filter(orderstatus=0))
+    dashboard = { 'numorders': norders,'numusers':nusers,'numproducts':nproducts,'numfeedback':nfeedback,'pendingorders':orderspending}
+    return Response(dashboard)
