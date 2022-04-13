@@ -370,5 +370,6 @@ def dashboard(request):
     norders = len(Orders.objects.all())
     nfeedback = len(Feedback.objects.all())
     orderspending = len(Orders.objects.filter(orderstatus=0))
-    dashboard = { 'numorders': norders,'numusers':nusers,'numproducts':nproducts,'numfeedback':nfeedback,'pendingorders':orderspending}
+    outofstockproducts=len(Product.objects.filter(stock=0))
+    dashboard = { 'numorders': norders,'numusers':nusers,'numproducts':nproducts,'numfeedback':nfeedback,'pendingorders':orderspending,'poutofstocks':outofstockproducts}
     return Response(dashboard)

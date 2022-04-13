@@ -65,7 +65,8 @@
                 </div>
               </div>
             </div>
-            <div class="row">You have {{dashboard.pendingorders}} pending orders</div>
+            <div class="row" v-if="dashboard.pendingorders >0">You have {{dashboard.pendingorders}} pending orders</div>
+            <div class="row" v-if="dashboard.poutofstocks >0">You have {{dashboard.poutofstocks}} Products out of stock</div>
           </div>
         </div>
       </div>
