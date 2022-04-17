@@ -116,7 +116,7 @@ def updateproductquantity(product,cart,operator):
         Cart.objects.filter(cartid=cart.cartid).update(numofproducts=F('numofproducts')-1)
     elif operator == 'c':
         Cartdetails.objects.create(cartid=cart,productcode=product,quantity=1)
-        Cart.objects.filter(cartid=cart.cartid).update(numofproducts=F('numofproducts')+1)
+        Cart.objects.filter(cartid=cart.cartid).update(numofproducts=F('numofproducts')+1,total=product.price)
     else:
         detail= Cartdetails.objects.get(productcode=product, cartid=cart)
         if operator == '+' and detail.quantity<product.stock:

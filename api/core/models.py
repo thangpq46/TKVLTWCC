@@ -1,3 +1,4 @@
+from multiprocessing.dummy import Manager
 from django.db import models
 from datetime import date
 
@@ -9,7 +10,7 @@ class Brand(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     brandname = models.CharField(db_column='BrandName', max_length=200)  # Field name made lowercase.
     branddes = models.CharField(db_column='BrandDes', max_length=2000, blank=True, null=True)  # Field name made lowercase.
-    img = models.CharField(db_column='IMG', max_length=200, blank=True, null=True)  # Field name made lowercase.
+    img = models.ImageField(db_column='IMG', max_length=200, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         db_table = 'core_brand'
@@ -43,7 +44,7 @@ class Cart(models.Model):
 class Cartdetails(models.Model):
     deltailsid = models.AutoField(db_column='DeltailsID', primary_key=True)  # Field name made lowercase.
     cartid = models.ForeignKey(Cart, models.CASCADE, db_column='CartID',default=-1)  # Field name made lowercase.
-    productcode = models.ForeignKey(Product, models.CASCADE, db_column='ProductCode',null=True) # Field name made lowercase.# Field name made lowercase.
+    productcode = models.ForeignKey(Product, models.CASCADE, db_column='ProductID',null=True) # Field name made lowercase.# Field name made lowercase.
     quantity = models.IntegerField(default=1)
 
     class Meta:
@@ -74,10 +75,11 @@ class Orders(models.Model):
     class Meta:
         db_table = 'core_orders'
 
+
 class Orderdetails(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     orderid = models.ForeignKey(Orders, models.CASCADE, db_column='OrderID')  # Field name made lowercase.
-    productcode = models.ForeignKey(Product, models.CASCADE, db_column='ProductCode',null=True)  # Field name made lowercase.
+    productcode = models.ForeignKey(Product, models.CASCADE, db_column='ProductID',null=True)  # Field name made lowercase.
     quantity = models.IntegerField(db_column='Quantity')  # Field name made lowercase.
 
     class Meta:

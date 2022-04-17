@@ -48,7 +48,7 @@ export default {
         await this.$axios.$post('addtocart/', {
           productcode: productcode,
         })
-        this.$nuxt.refresh()
+        // this.$nuxt.refresh()
         this.$router.go()
       } else {
         this.$router.push('/login/')
