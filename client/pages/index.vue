@@ -1,5 +1,6 @@
 <template>
   <div>
+    {{newproducts}}
     <Header :brands="brands"></Header>
     <BannerTop />
     <Brand :brands="brands"/>

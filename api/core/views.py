@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from django.db import connection
 from rest_framework.reverse import reverse
 from django.db.models import F
 import requests
@@ -114,9 +115,6 @@ def updateproductquantity(product,cart,operator):
     if operator == 'x':
         Cartdetails.objects.filter(productcode=product, cartid=cart).delete()
         Cart.objects.filter(cartid=cart.cartid).update(numofproducts=F('numofproducts')-1)
-    elif operator == 'c':
-        Cartdetails.objects.create(cartid=cart,productcode=product,quantity=1)
-        Cart.objects.filter(cartid=cart.cartid).update(numofproducts=F('numofproducts')+1,total=product.price)
     else:
         detail= Cartdetails.objects.get(productcode=product, cartid=cart)
         if operator == '+' and detail.quantity<product.stock:
@@ -132,13 +130,14 @@ def updateproductquantity(product,cart,operator):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def Addtocart(request):
-    pcode= request.data.get('productcode')   
+    pid= request.data.get('productid')   
     username= request.user
-    product = Product.objects.get(productcode=pcode)
+    product = Product.objects.get(productid=pid)
     cart = Cart.objects.get(username=username)
-    if len(Cartdetails.objects.filter(productcode=product,cartid=cart)) < 1: #check if exist in user's cart
-        # Cartdetails.objects.create(productcode=product,cartid=cart)
-        updateproductquantity(product,cart,'c')
+    # if len(Cartdetails.objects.filter(productcode=product,cartid=cart)) < 1: #check if exist in user's cart
+    #     # Cartdetails.objects.create(productcode=product,cartid=cart)
+    #     updateproductquantity(product,cart,'c')
+    connection.cursor().execute("call add_to_cart(%s, %s, %s);",[1,cart.cartid,pid])
     return Response(status=status.HTTP_200_OK)
 
 @api_view(['GET'])
