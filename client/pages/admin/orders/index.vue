@@ -127,6 +127,7 @@
 </template>
 <script>
 export default {
+  middleware:  ['auth-admin'],
   async asyncData({ $axios }) {
     const orders = await $axios.$get('/adminorderview/')
     return { orders }

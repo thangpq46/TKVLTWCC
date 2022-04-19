@@ -75,7 +75,8 @@
 </template>
 <script>
 export default {
-    head() {
+  middleware:  ['auth-admin'],
+    head() {  
     return {
       title: "Admin Site"
     };

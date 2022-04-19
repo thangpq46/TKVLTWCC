@@ -1,7 +1,6 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate,logout as logoutuser,login as loginuser
 from django.db import connection
 from rest_framework.reverse import reverse
-from django.db.models import F
 import requests
 from rest_framework_simplejwt import *
 import re
@@ -169,6 +168,7 @@ def changecartdetails(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout(request):
+    logoutuser(request)
     return Response()
 
 @api_view(['POST'])
@@ -181,7 +181,6 @@ def Checkout(request):
     items = Cartdetails.objects.filter(cartid=cart)
     for item in items:
         Orderdetails.objects.create(orderid=order,productid=item.productid,quantity=item.quantity)
-        Product.objects.filter(productid=item.productid.productid).update(stock=F('stock')-item.quantity)
     Cartdetails.objects.filter(cartid=cart).delete()
     return Response(status=status.HTTP_202_ACCEPTED)
 

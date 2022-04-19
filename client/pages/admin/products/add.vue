@@ -119,6 +119,7 @@
 
 <script>
 export default {
+  middleware:  ['auth-admin'],
     async asyncData({ $axios}){
       const brands = await $axios.$get('/brand/')
       return {brands}

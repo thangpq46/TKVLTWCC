@@ -68,6 +68,7 @@
 </template>
 <script>
 export default {
+  middleware:  ['auth-admin'],
     head() {
     return {
       title: "Products"
