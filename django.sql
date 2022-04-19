@@ -42,7 +42,7 @@ BEGIN
     update core_cart set Total=Total+pprice*quan where CartID=CID;
 END
 DELIMITER ;
-
+----------------------------------------------- 
 
 DELIMITER $$
 
@@ -58,7 +58,7 @@ END$$
 
 DELIMITER ;
 drop trigger on_delete_cartdetails;
-
+------------------------------------------------ 
 
 DELIMITER $$
 
@@ -68,8 +68,35 @@ CREATE TRIGGER on_update_cartdetails
 BEGIN
 	DECLARE pprice DOUBLE DEFAULT 0;
     select Price into pprice from core_product where ID=OLD.ProductID;
-	UPDATE core_cart set Total=Total+(NEW.quantity-OLD.quantity)*pprice where CartID=OLD.CartID;
+	UPDATE core_cart set Total=Total-(pprice*OLD.quantity) where CartID=OLD.CartID;
 END$$    
 
 DELIMITER ;
 drop trigger on_update_cartdetails;
+------------------------------------------------------- 
+
+DELIMITER $$
+CREATE TRIGGER on_delete_orderdetails
+AFTER DELETE
+ON core_orderdetails FOR EACH ROW
+BEGIN
+	DECLARE pprice DOUBLE DEFAULT 0;
+    select Price into pprice from core_product where ID=OLD.ProductID;
+	UPDATE core_orders set Total=Total-(pprice*OLD.Quantity) where OrderID=OLD.OrderID;
+END$$    
+
+DELIMITER ;
+
+
+
+DELIMITER $$
+CREATE TRIGGER on_delete_product
+BEFORE DELETE
+ON core_product FOR EACH ROW
+BEGIN
+	delete from core_orderdetails where ProductID=OLD.ID;
+    delete from core_cartdetails where ProductID=OLD.ID;
+END$$    
+
+DELIMITER ;
+drop trigger on_delete_product;

@@ -165,6 +165,7 @@ export default {
         if(response.status==202){
           // must haave nofi success on place order
           this.$router.push('/')
+          await this.$auth.fetchUser()
         }
       }
       catch(e){

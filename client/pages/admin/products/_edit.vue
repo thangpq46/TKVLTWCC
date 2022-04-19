@@ -171,7 +171,8 @@ export default {
         await this.$axios.$delete("/productadminview/",
           { data: { productid: productid } }
         );
-        // this.$router.push('/admin/products/');
+        // add nofi make sure user want to delete product
+        this.$router.push('/admin/products/');
       } catch (e) {
         console.log(e);
       }

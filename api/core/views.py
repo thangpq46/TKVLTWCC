@@ -183,7 +183,6 @@ def Checkout(request):
         Orderdetails.objects.create(orderid=order,productid=item.productid,quantity=item.quantity)
         Product.objects.filter(productid=item.productid.productid).update(stock=F('stock')-item.quantity)
     Cartdetails.objects.filter(cartid=cart).delete()
-    # Cart.objects.filter(username=username).update(numofproducts=0)
     return Response(status=status.HTTP_202_ACCEPTED)
 
 @api_view(['GET'])
@@ -248,7 +247,6 @@ def productadminview(request):
     productid = request.data.get('productid')
     if request.method == 'DELETE':
         Product.objects.filter(productid=productid).delete()
-        # need to write trigger to delete order and cart contain this product
         return Response(status=status.HTTP_202_ACCEPTED)
     else:
         productcode = request.data.get('productcode')
