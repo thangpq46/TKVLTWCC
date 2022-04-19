@@ -29,7 +29,7 @@
               <p v-for="detail in details" :key="detail">{{ detail }}</p>
               <p v-if="product.stock > 1"><b>Còn Hàng</b></p>
               <p v-else><b>Hết Hàng</b></p>
-              <button class="btn btn-danger" @click="addtocart(product.name)">
+              <button class="btn btn-danger" @click="addtocart(product.productid)">
                 MUA HÀNG
               </button>
             </div>
@@ -37,24 +37,7 @@
         </div>
       </div>
     </div>
-    <div class="section">
-      <div class="container">
-        <div class="row">
-          <div class="col-12">
-            <div class="block__header">
-              <h2 class="block-header-title text-center">SẢN PHẨM TƯƠNG TỰ</h2>
-            </div>
-          </div>
-          <div
-            v-for="product in products"
-            :key="product.productcode"
-            class="col-lg-3 col-md-4 col-6 items-product mg-bt-30"
-          >
-            <ProductCard :product="product"></ProductCard>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Productsections :products="products" sectiontitle="Sản Phẩm Tương Tự"/>
     <Top-footer />
     <Footer />
   </div>
@@ -67,6 +50,19 @@ export default {
     const products = await $axios.$get(`/products`)
     const details = product.description.split('- ')
     return { product, products, details }
+  },
+    methods: {
+    async addtocart(productid) {
+      if (this.$auth.loggedIn) {
+        await this.$axios.$post('addtocart/', {
+          productid: productid,
+        })
+        // this.$nuxt.refresh()
+        this.$router.go()
+      } else {
+        this.$router.push('/login/')
+      }
+    },
   },
 }
 </script>

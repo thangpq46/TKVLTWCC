@@ -6,9 +6,16 @@
           <div class="">
             <div class="swiper mySwiper">
               <div class="swiper-wrapper">
-                <div class="swiper-slide" v-for="brand in brands" :key="brand.brandname">
-                  <a  :href="filterproducts(brand.brandname)">
-                    <img class="img-fluid rounded mx-auto d-block" :src="brand.img" />
+                <div
+                  class="swiper-slide"
+                  v-for="brand in brands"
+                  :key="brand.brandname"
+                >
+                  <a :href="filterproducts(brand.brandname)">
+                    <img
+                      class="img-fluid rounded mx-auto d-block"
+                      :src="brand.img"
+                    />
                   </a>
                 </div>
               </div>
@@ -43,27 +50,8 @@
 <script>
 export default {
   auth: 'guest',
-  props: ['brands'],
+  props: ['brands' ],
   methods: {
-    getsortname(name) {
-      name = name.substring(0, 55)
-      return { name }
-    },
-    getproductsurl(productid) {
-      const url = '/products/' + productid
-      return url
-    },
-    async addtocart(ProductName) {
-      if (this.$auth.loggedIn) {
-        await this.$axios.$post('addtocart/', {
-          productname: ProductName,
-        })
-        this.$nuxt.refresh()
-        this.$router.go()
-      } else {
-        this.$router.push('/login/')
-      }
-    },
     filterproducts(searchinput) {
       if (searchinput === '') {
         return '/products'
