@@ -48,11 +48,11 @@ export default {
         await this.$axios.$post('addtocart/', {
           productid: productid,
         })
-        // this.$nuxt.refresh()
-        this.$router.go()
+        await this.$auth.fetchUser()
       } else {
         this.$router.push('/login/')
       }
+      
     },
   },
 }
