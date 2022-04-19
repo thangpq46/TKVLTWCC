@@ -111,32 +111,12 @@ def Productfilter(request):
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-def updateproductquantity(product,cart,operator):
-    if operator == 'x':
-        Cartdetails.objects.filter(productcode=product, cartid=cart).delete()
-        Cart.objects.filter(cartid=cart.cartid).update(numofproducts=F('numofproducts')-1)
-    else:
-        detail= Cartdetails.objects.get(productcode=product, cartid=cart)
-        if operator == '+' and detail.quantity<product.stock:
-            Cartdetails.objects.filter(productcode=product, cartid=cart).update(quantity=F('quantity')+1)
-            cart.total=cart.total+product.price
-        if operator == '-'and detail.quantity>1:
-            Cartdetails.objects.filter(productcode=product, cartid=cart).update(quantity=F('quantity')-1)
-            cart.total=cart.total-product.price
-        cart.save()
-    return
-
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def Addtocart(request):
     pid= request.data.get('productid')   
     username= request.user
-    product = Product.objects.get(productid=pid)
     cart = Cart.objects.get(username=username)
-    # if len(Cartdetails.objects.filter(productcode=product,cartid=cart)) < 1: #check if exist in user's cart
-    #     # Cartdetails.objects.create(productcode=product,cartid=cart)
-    #     updateproductquantity(product,cart,'c')
     connection.cursor().execute("call add_to_cart(%s, %s, %s);",[1,cart.cartid,pid])
     return Response(status=status.HTTP_200_OK)
 
@@ -148,8 +128,8 @@ def CartdetailsView(request):
     queryset = Cartdetails.objects.filter(cartid=cart)
     serializer = CartdetailsSerializer(queryset,many=True).data
     for s in serializer:
-        Product.objects.get(productid=s['productcode']).img
-        query = Product.objects.filter(productid=s['productcode'])
+        Product.objects.get(productid=s['productid']).img
+        query = Product.objects.filter(productid=s['productid'])
         product =ProductSerializer(query,many=True,context={'request': request}).data[0]
         s['productname']= product['name']
         s['img'] = product['img']
@@ -171,13 +151,20 @@ def OrdersView(request):
 @permission_classes([IsAuthenticated])
 def changecartdetails(request):
     data = request.data.get('data')
-    productcode = data['productcode']
+    productid = data['productid']
     operator = data['operator']
-    username = request.user
-    product = Product.objects.get(productid=productcode)
-    cart = Cart.objects.get(username=username)
-    updateproductquantity(product,cart,operator)
-    return Response(status=status.HTTP_200_OK)
+    product = Product.objects.get(productid=productid)
+    cart = Cart.objects.get(username=request.user)
+    detail=Cartdetails.objects.get(productid=productid,cartid=cart)
+    if operator =='x':
+        detail.delete()
+    elif operator =='+' and detail.quantity<product.stock:
+        detail.quantity+=1
+        detail.save()
+    elif operator =='-' and detail.quantity>1:    
+        detail.quantity-=1
+        detail.save()
+    return Response(status=status.HTTP_202_ACCEPTED)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -193,10 +180,10 @@ def Checkout(request):
     order= Orders.objects.create(username=username,orderaddress=address,total=cart.total)
     items = Cartdetails.objects.filter(cartid=cart)
     for item in items:
-        Orderdetails.objects.create(orderid=order,productcode=item.productcode,quantity=item.quantity)
-        Product.objects.filter(productcode=item.productcode.productcode).update(stock=F('stock')-item.quantity)
+        Orderdetails.objects.create(orderid=order,productid=item.productid,quantity=item.quantity)
+        Product.objects.filter(productid=item.productid.productid).update(stock=F('stock')-item.quantity)
     Cartdetails.objects.filter(cartid=cart).delete()
-    Cart.objects.filter(username=username).update(numofproducts=0)
+    # Cart.objects.filter(username=username).update(numofproducts=0)
     return Response(status=status.HTTP_202_ACCEPTED)
 
 @api_view(['GET'])
@@ -237,7 +224,7 @@ def AdminOrderView(request):
             queryset= Orderdetails.objects.filter(orderid=orderid)
             details = OrderdetailsSerializer(queryset,many=True).data
             for d in details:
-                query = Product.objects.filter(productid=d['productcode'])
+                query = Product.objects.filter(productid=d['productid'])
                 product = ProductSerializer(query,many=True,context={'request': request}).data[0]
                 d['price'] = product['price']
                 d['intomoney']= d['price']*d['quantity']
@@ -315,7 +302,7 @@ def userorders(request):
             queryset =Orderdetails.objects.filter(orderid=order['orderid'])
             details =OrderdetailsSerializer(queryset,many=True,context={'request': request}).data 
             for d in details:
-                pquery = Product.objects.filter(productid=int(d['productcode']))
+                pquery = Product.objects.filter(productid=int(d['productid']))
                 product = ProductSerializer(pquery,many=True,context={'request': request}).data[0]
                 d['productname'] = product['name']
                 d['price'] =product['price']

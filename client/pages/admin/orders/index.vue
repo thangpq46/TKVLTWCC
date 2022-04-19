@@ -149,8 +149,8 @@ export default {
           //nofi change status 
         }
       }
-      
-      this.$router.go()
+      this.$nuxt.refresh()
+      // this.$router.go()
     },
   },
 }

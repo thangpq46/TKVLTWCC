@@ -44,7 +44,7 @@ class Cart(models.Model):
 class Cartdetails(models.Model):
     deltailsid = models.AutoField(db_column='DeltailsID', primary_key=True)  # Field name made lowercase.
     cartid = models.ForeignKey(Cart, models.CASCADE, db_column='CartID',default=-1)  # Field name made lowercase.
-    productcode = models.ForeignKey(Product, models.CASCADE, db_column='ProductID',null=True) # Field name made lowercase.# Field name made lowercase.
+    productid = models.ForeignKey(Product, models.CASCADE, db_column='ProductID',null=True) # Field name made lowercase.# Field name made lowercase.
     quantity = models.IntegerField(default=1)
 
     class Meta:
@@ -79,7 +79,7 @@ class Orders(models.Model):
 class Orderdetails(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     orderid = models.ForeignKey(Orders, models.CASCADE, db_column='OrderID')  # Field name made lowercase.
-    productcode = models.ForeignKey(Product, models.CASCADE, db_column='ProductID',null=True)  # Field name made lowercase.
+    productid = models.ForeignKey(Product, models.CASCADE, db_column='ProductID',null=True)  # Field name made lowercase.
     quantity = models.IntegerField(db_column='Quantity')  # Field name made lowercase.
 
     class Meta:
