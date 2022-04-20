@@ -116,7 +116,7 @@
                   />
                 </td>
               </tr>
-              <tr>
+              <!-- <tr>
                 <td>Password</td>
                 <td>
                   <input type="password" v-model="password" class="form-control" />
@@ -133,7 +133,7 @@
                 <td>
                   <input type="password" v-model="rnew_password" class="form-control" />
                 </td>
-              </tr>
+              </tr> -->
               <tr v-if="status != ''">
                 <td>
 

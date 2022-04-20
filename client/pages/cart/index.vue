@@ -1,6 +1,5 @@
 <template>
   <div class="bg-color-brown">
-    {{ cart }}
     <Header :brands="brands"></Header>
     <BannerTop />
     <div v-if="$auth.user.numofproducts < 1" class="section pd-top-20">

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="bg-color-brown section-checkout">
-      <!-- <Header :preview="preview" :brands="brands"></Header> -->
+      <Header :preview="preview" :brands="brands"></Header>
       <BannerTop />
       <div class="section pd-top-20">
         <div class="container">
@@ -76,21 +76,21 @@
                     <span class="font-weight-500">{{ $auth.user.email }}</span>
                   </div>
                   <div class="justify-content-between">
-                    <select v-model="province">
+                    <select v-model="province" class="form-control mg-bottom-10">
                       <option 
                         v-for="(adr, index) in address"
                         :key="adr.name"
                         :value=index
                       >{{adr.name}}</option>
                     </select>
-                    <select v-model="distri">
+                    <select v-model="distri" class="form-control mg-bottom-10">
                       <option 
                         v-for="(district,index) in address[province].districts"
                         :key="district.name"
                         :value=index
                       >{{district.name}}</option>
                     </select>
-                    <select v-model="ward">
+                    <select v-model="ward" class="form-control mg-bottom-10">
                       <option 
                         v-for="(ward,index) in address[province].districts[distri].wards"
                         :key="ward.name"
@@ -149,7 +149,7 @@ export default {
       shippingaddress: '',
       province: 0,
       distri:0,
-      ward:0
+      ward:0,
     }
   },
   methods: {
@@ -160,11 +160,12 @@ export default {
       const address =this.shippingaddress + ', '+userward.name + ', '+userdistrict.name+ ', '+ userprovince.name ;
       try{
         const response= await this.$axios.post('checkout/', {
-        address: address,
+        address
         })
-        if(response.status==202){
+        if(response.status===202){
           // must haave nofi success on place order
           this.$router.push('/')
+          await this.$auth.fetchUser()
         }
       }
       catch(e){
