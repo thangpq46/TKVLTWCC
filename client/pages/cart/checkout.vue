@@ -163,7 +163,10 @@ export default {
         address
         })
         if(response.status===202){
+          
           // must haave nofi success on place order
+          alert("Đặt hàng thành công")
+
           this.$router.push('/')
           await this.$auth.fetchUser()
         }

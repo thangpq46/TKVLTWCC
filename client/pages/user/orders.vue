@@ -18,28 +18,31 @@
               <table class="table align-middle table-bordered">
                 <thead>
                   <tr>
-                    <th colspan="4"># {{ order.orderid }}</th>
+                    <th colspan="5"># {{ order.orderid }}</th>
                   </tr>
                 </thead>
                 <tr>
                   <td>Ngày đặt hàng</td>
-                  <td colspan="3">
+                  <td colspan="4">
                     {{ order.orderdate }}
                   </td>
                 </tr>
                 <tr>
                   <td>Tài khoản</td>
-                  <td colspan="3">
+                  <td colspan="4">
                     {{ order.username }}
                   </td>
+                  
+                </tr>
+                <tr>
                   <td>SĐT</td>
-                  <td colspan="3">
+                  <td colspan="4">
                     {{ order.phonenum }}
                   </td>
                 </tr>
                 <tr>
                   <td>Địa chỉ</td>
-                  <td colspan="3">
+                  <td colspan="5">
                     {{ order.orderaddress }}
                   </td>
                 </tr>
@@ -69,13 +72,13 @@
                     </a>
                   </th>
                   <th class="align-middle">
-                    {{ details.intomoney }}
+                    {{ details.intomoney }}$
                   </th>
                 </tr>
                 <tr>
                   <th>Tổng giá:</th>
                   <th colspan="2">{{ order.total }}$</th>
-                  <th>
+                  <th colspan="2">
                     <span v-if="order.orderstatus === 0" class="btn btn-warning"
                       >Đang chờ xử lí</span
                     >
@@ -125,7 +128,7 @@ export default {
   },
   methods: {
     async cancelorder(id) {
-      const response = await this.$axios.$post('/userorders/', {
+      await this.$axios.$post('/userorders/', {
         orderid: id,
       })
       this.$router.go()

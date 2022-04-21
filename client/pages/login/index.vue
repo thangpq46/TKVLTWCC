@@ -47,19 +47,22 @@ export default {
         if (this.$auth.user.is_staff) {
           this.$router.push('/admin')
         }
-        else if(response.status==200) {
+        else if(response.status===200) {
           this.$router.push('/')
         }
       } catch (e) {
         console.log(e)
-        if(e.response.status==204){
+        if(e.response.status===204){
           // this.status = "Please fill all fields!"
+          alert("Please fill all fields!")
         }
-        else if(e.response.status==404){
+        else if(e.response.status===404){
           // this.status = "Username does not exist!"
+          alert("Username does not exist!")
         }
-        else if(e.response.status==401){
+        else if(e.response.status===401){
           // this.status = "Incorrect password!"
+          alert("Incorrect password!")
         }
       }
       this.$nuxt.refresh()
