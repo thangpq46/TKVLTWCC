@@ -11,7 +11,7 @@
             <div class="row">
               <div class="col-12 bg-white">
                 <span style="font-size: 22px; font-weight: 600"
-                  >Edit Products</span
+                  >Edit Brand</span
                 >
               </div>
               <div class="col-12 mg-top-20">
@@ -28,31 +28,21 @@
                           </td>
                         </tr>
                         <tr>
-                          <th>Mã sản phẩm</th>
+                          <th>Tên Hãng</th>
                           <td>
                             <input
-                              v-model="product.productcode"
+                              v-model="brand.brandname"
                               type="text"
                               class="form-control"
                             />
                           </td>
                         </tr>
                         <tr>
-                          <th>Tên sản phẩm</th>
-                          <td>
-                            <input
-                              v-model="product.name"
-                              type="text"
-                              class="form-control"
-                            />
-                          </td>
-                        </tr>
-                        <tr>
-                          <th>Thông số sản phẩm</th>
+                          <th>Thông Tin Hãng</th>
                           <td>
                             <textarea
                               class="form-control"
-                              v-model="product.description"
+                              v-model="brand.branddes"
                               name=""
                               id=""
                               cols="30"
@@ -61,47 +51,10 @@
                           </td>
                         </tr>
                         <tr>
-                          <th>Giá sản phẩm</th>
-                          <td>
-                            <input
-                              v-model="product.price"
-                              type="number"
-                              class="form-control"
-                            />
-                          </td>
-                        </tr>
-                        <tr>
-                          <th>Số lượng trong kho</th>
-                          <td>
-                            <input
-                              v-model="product.stock"
-                              type="number"
-                              class="form-control"
-                            />
-                          </td>
-                        </tr>
-                        <tr>
-                          <th>Hãng</th>
-                          <td>
-                            <select
-                              v-model="product.brandname"
-                              class="form-control"
-                            >
-                              <option
-                                v-for="brand in brands"
-                                :key="brand.id"
-                                :value="brand.id"
-                              >
-                                {{ brand.brandname }}
-                              </option>
-                            </select>
-                          </td>
-                        </tr>
-                        <tr>
                           <td></td>
                           <td>
-                            <button class="btn btn-success" @click="editProduct(product)">Change</button>
-                            <button class="btn btn-danger" @click="deleteProduct(product.productid)">Delete</button>
+                            <button class="btn btn-success" @click="editBrand(brand)">Change</button>
+                            <button class="btn btn-danger" @click="deleteBrand(brand.id)">Delete</button>
                           </td>
                         </tr>
                       </table>
@@ -120,14 +73,14 @@ export default {
   middleware:  ['auth-admin'],
     head() {
     return {
-      title: "Edit Product"
+      title: "Edit Brand"
     };
   },
   async asyncData({ $axios, params }) {
-    const product = await $axios.$get(`/products/${params.edit}`)
+    const brand = await $axios.$get(`/brand/${params.edit}`)
     const brands = await $axios.$get('/brand/')
-    const preview = product.img
-    return { product,brands,preview}
+    const preview = brand.img
+    return { brand,brands,preview}
   },
   data() {
     return {
@@ -151,28 +104,25 @@ export default {
       };
       reader.readAsDataURL(file);
     },
-    async editProduct(product) {
+    async editBrand(brand) {
       const config = {
         headers: { "content-type": "multipart/form-data" }
       };
       const formData = new FormData();
-      console.log(product)
-      for (const data in product) {
-        formData.append(data,product[data]);
+      for (const data in brand) {
+        formData.append(data,brand[data]);
       }
       try {
-        await this.$axios.$post("/productadminview/",formData,config);
-        this.$router.push('/admin/products/'+this.product.productcode)
+        await this.$axios.$post("/adminbrand/",formData,config);
       } catch (e) {
       }
     },
-    async deleteProduct(productid) {
+    async deleteBrand(brandid) {
       try {
-        await this.$axios.$delete("/productadminview/",
-          { data: { productid: productid } }
+        await this.$axios.$delete("/adminbrand/",
+          { data: { brandid } }
         );
         // add nofi make sure user want to delete product
-        this.$router.push('/admin/products/');
       } catch (e) {
         console.log(e);
       }

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <div>{{brands}}</div>
     <Header-admin></Header-admin>
     <div class="section">
       <div class="container-fluid">
@@ -11,7 +12,7 @@
             <div class="row">
               <div class="col-12 bg-color-brown">
                 <span style="font-size: 22px; font-weight: 600"
-                  >List Products</span
+                  >List Brands</span
                 >
               </div>
               <div class="col-12 table-responsive">
@@ -23,33 +24,25 @@
                 >
                   <thead>
                     <tr>
-                      <th>Mã SP</th>
-                      <th>Tên sản phẩm</th>
-                      <th>Giá</th>
-                      <th>Thông số</th>
-                      <th>Hình ảnh</th>
-                      <th>Số lượng</th>
+                      <th>Tên Hãng</th>
+                      <th>Mô Tả</th>
+                      <th>Hình Ảnh</th>
                       <th>
-                        <a href="/admin/products/add" class="btn btn-success">
+                        <a href="/admin/brands/add" class="btn btn-success">
                           <i class="bi bi-clipboard-plus"></i>
-                          <span>Add Products</span>
+                          <span>Add Brand</span>
                         </a>
                       </th>
                     </tr>
                   </thead>
-                  <tr v-for="product in products" :key="product.productcode">
-                    <th>{{ product.productcode }}</th>
+                  <tr v-for="brand in brands" :key="brand.brandname">
+                    <th>{{ brand.brandname }}</th>
+                    <td>{{ brand.branddes }}</td>
                     <td>
-                      {{ product.name }}
+                      <img :src="brand.img" class="add-pr"/>
                     </td>
-                    <td>{{ product.price }}$</td>
-                    <td>{{ product.description }}</td>
                     <td>
-                      <img :src="product.img" class="add-pr"/>
-                    </td>
-                    <td>{{ product.stock }}</td>
-                    <td>
-                      <NuxtLink :to="'/admin/products/' + product.productcode"
+                      <NuxtLink :to="'/admin/brands/'+brand.id"
                         ><button class="btn btn-danger" type="button">
                           Chỉnh sửa
                         </button></NuxtLink
@@ -71,12 +64,12 @@ export default {
   middleware:  ['auth-admin'],
     head() {
     return {
-      title: "Products"
+      title: "Brands"
     };
   }, 
   async asyncData({ $axios }) {
-    const products = await $axios.$get('/products/')
-    return { products }
-  }
+    const brands = await $axios.$get('/brand/')
+    return { brands }
+  },
 }
 </script>

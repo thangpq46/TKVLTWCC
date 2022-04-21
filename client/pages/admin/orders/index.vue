@@ -1,5 +1,6 @@
 <template>
   <div>
+    {{orders}}
     <Header-admin></Header-admin>
     <div class="section">
       <div class="container-fluid">

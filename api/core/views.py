@@ -224,6 +224,7 @@ def AdminOrderView(request):
             for d in details:
                 query = Product.objects.filter(productid=d['productid'])
                 product = ProductSerializer(query,many=True,context={'request': request}).data[0]
+                d['productname']=product['name']
                 d['price'] = product['price']
                 d['intomoney']= d['price']*d['quantity']
                 d['img']=product['img']
@@ -268,6 +269,8 @@ def productadminview(request):
                 temp.delete()
             Product.objects.filter(productid=productid).update(productcode=productcode,name=name,price=price,description=description,img=img,stock=stock,brandname=brand)
             return Response(status=status.HTTP_202_ACCEPTED)
+
+
 @api_view(['POST'])
 def submitFeed(request):
     feedback = request.data.get('feedback')
@@ -356,3 +359,35 @@ def dashboard(request):
     outofstockproducts=len(Product.objects.filter(stock=0))
     dashboard = { 'numorders': norders,'numusers':nusers,'numproducts':nproducts,'numfeedback':nfeedback,'pendingorders':orderspending,'poutofstocks':outofstockproducts}
     return Response(dashboard)
+
+@api_view(['GET'])  
+def Brandbycode(request,code):
+    queryset=Brand.objects.filter(id=code)
+    serializers=BrandSerializer(queryset,many=True,context={'request': request}).data[0]
+    return Response(serializers)
+
+@api_view(['POST','DELETE','PUT'])
+@permission_classes([IsAdminUser])
+def Brandedit(request):
+    print(request.data)
+    if request.method == 'DELETE':
+        Brand.objects.filter(id=request.data.get('brandid')).delete()
+    elif request.method == 'POST':
+        pass
+        brandid = request.data.get('id')
+        name = request.data.get('brandname')
+        price = request.data.get('branddes')
+        img = request.data.get('img')
+    #     if request.method == 'PUT':
+    #         if not Product.objects.filter(productcode=productcode).exists() and not Product.objects.filter(name=name).exists() :
+    #             Product.objects.create(productcode=productcode, name=name,price=price, description=description,img=img, brandname=brand,stock=stock)
+    #             return Response(status=status.HTTP_201_CREATED)
+    #         else:
+    #             return Response(status=status.HTTP_409_CONFLICT)
+    #     if request.method == 'POST':
+    #         if(type(img)!=str):
+    #             temp = Profile.objects.create(username=request.user,img=img)
+    #             temp.delete()
+    #         Product.objects.filter(productid=productid).update(productcode=productcode,name=name,price=price,description=description,img=img,stock=stock,brandname=brand)
+    #         return Response(status=status.HTTP_202_ACCEPTED)
+    return Response(status=status.HTTP_202_ACCEPTED)

@@ -28,5 +28,7 @@ urlpatterns = [
     path('updateuser/',updateuser,name='updateuser'),
     path('changepass/',changepassword,name='changepass'),
     path('get_provinces_json',get_provinces_json,name='get_provinces'),
-    path('dashboard',dashboard,name='dashboard')
+    path('dashboard',dashboard,name='dashboard'),
+    path('brand/<str:code>/', Brandbycode,name='Brandbycode'),
+    path('adminbrand/', Brandedit,name='Brandedit'),
 ]

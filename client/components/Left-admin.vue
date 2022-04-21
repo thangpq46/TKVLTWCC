@@ -9,7 +9,7 @@
       </div>
       <div>
         <i class="fas fa-user"></i>
-        <a >
+        <a>
           <span>User</span>
         </a>
       </div>
@@ -29,6 +29,12 @@
         <i class="fas fa-envelope-open-text"></i>
         <a href="/admin/feedback">
           <span>Feedback</span>
+        </a>
+      </div>
+      <div>
+        <i class="fas fa-envelope-open-text"></i>
+        <a href="/admin/brands">
+          <span>Brands</span>
         </a>
       </div>
     </div>
