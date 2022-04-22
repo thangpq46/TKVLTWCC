@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>{{brands}}</div>
+    <!-- <div>{{brands}}</div> -->
     <Header-admin></Header-admin>
     <div class="section">
       <div class="container-fluid">

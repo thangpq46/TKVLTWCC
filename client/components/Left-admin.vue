@@ -32,7 +32,7 @@
         </a>
       </div>
       <div>
-        <i class="fas fa-envelope-open-text"></i>
+        <i class="bi bi-layers-fill"></i>
         <a href="/admin/brands">
           <span>Brands</span>
         </a>

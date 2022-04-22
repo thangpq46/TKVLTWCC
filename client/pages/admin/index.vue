@@ -64,9 +64,19 @@
                   </div>
                 </div>
               </div>
+              <div class="col-12 mg-top-20" >
+                <div class="notification-adm bg-white align-items-center" v-if="dashboard.pendingorders >0">
+                  <span>
+                    You have {{dashboard.pendingorders}} pending orders
+                  </span>
+                </div>
+                <div class="notification-adm bg-white align-items-center mg-top-20" v-if="dashboard.poutofstocks >0">
+                  <span>
+                    You have {{dashboard.poutofstocks}} Products out of stock
+                  </span>
+                </div>
+              </div>
             </div>
-            <div class="row" v-if="dashboard.pendingorders >0">You have {{dashboard.pendingorders}} pending orders</div>
-            <div class="row" v-if="dashboard.poutofstocks >0">You have {{dashboard.poutofstocks}} Products out of stock</div>
           </div>
         </div>
       </div>
