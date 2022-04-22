@@ -41,12 +41,11 @@ def userview(request):
     cart,created = Cart.objects.get_or_create(username=username)
     user['numofproducts']=cart.numofproducts
     profilequery = Profile.objects.filter(username=username)
-    profileseri=ProfileSerializer(profilequery,many=True,context={'request': request}).data
-    try:
-        user['img'] = profileseri[0]['img']
-    except:
+    if(len(profilequery)<1):
         Profile.objects.create(username=username)
-        user['img'] = profileseri[0]['img']
+    profilequery = Profile.objects.filter(username=username)
+    profileseri=ProfileSerializer(profilequery,many=True,context={'request': request}).data
+    user['img'] = profileseri[0]['img']
     user['phonenum']=profileseri[0]['phonenum']
     response = Response(status=status.HTTP_200_OK)
     response.data ={
@@ -84,8 +83,6 @@ def register(request):
         user.last_name = userdata['last_name']
         user.first_name = userdata['first_name']
         user.save()
-        Cart.objects.create(username=username)
-        Profile.objects.create(username=username)
         return Response(status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
@@ -186,13 +183,13 @@ def Checkout(request):
 
 @api_view(['GET'])
 def NewProductView(request):
-    queryset=Product.objects.all().order_by('-createdate')[:8]
+    queryset=Product.objects.exclude(stock=0).order_by('-createdate')[:8]
     serializers=ProductSerializer(queryset,many=True,context={'request': request}).data
     return Response(serializers)
 
 @api_view(['GET'])
 def instockProductView(request):
-    queryset=Product.objects.all().order_by('-stock')[:8]
+    queryset=Product.objects.exclude(stock=0).order_by('-stock')[:8]
     serializers=ProductSerializer(queryset,many=True,context={'request': request}).data
     return Response(serializers)
 

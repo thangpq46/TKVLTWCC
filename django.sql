@@ -21,14 +21,42 @@ BEGIN
 	else
 		if quan<pstock then
 			insert into core_cartdetails(quantity, CartID, ProductID) value (quan,CID,PID);
-            update core_cart set numofproducts=numofproducts+1 where CartID=CID;
 		end if;
     end if;
-    update core_cart set Total=Total+pprice*quan where CartID=CID;
 END
 DELIMITER ;
 ----------------------------------------------- 
 
+DELIMITER $$
+CREATE TRIGGER on_create_cartdetails
+AFTER INSERT
+ON core_cartdetails FOR EACH ROW
+BEGIN
+	DECLARE pprice DOUBLE DEFAULT 0;
+    select Price into pprice from core_product where ID=NEW.ProductID;
+	UPDATE core_cart set Total=Total+(NEW.Quantity*pprice) WHERE CartID=NEW.CartID;
+    UPDATE core_cart set numofproducts=numofproducts+1 WHERE CartID=NEW.CartID;
+END$$    
+
+DELIMITER ;
+drop trigger on_create_cartdetails;
+----------------------------------------
+DELIMITER $$
+
+CREATE TRIGGER on_update_cartdetails
+    AFTER UPDATE
+    ON core_cartdetails FOR EACH ROW
+BEGIN
+	DECLARE pprice DOUBLE DEFAULT 0;
+    select Price into pprice from core_product where ID=OLD.ProductID;
+	UPDATE core_cart set Total=Total+(pprice*(NEW.quantity-OLD.quantity)) where CartID=OLD.CartID;
+END$$    
+
+DELIMITER ;
+drop trigger on_update_cartdetails;
+------------------------------------------------------- 
+
+-----------------------------------------------
 DELIMITER $$
 
 CREATE TRIGGER on_delete_cartdetails
@@ -45,20 +73,20 @@ DELIMITER ;
 drop trigger on_delete_cartdetails;
 ------------------------------------------------ 
 
-DELIMITER $$
 
-CREATE TRIGGER on_update_cartdetails
-    AFTER UPDATE
-    ON core_cartdetails FOR EACH ROW
+DELIMITER $$
+CREATE TRIGGER on_delete_product
+BEFORE DELETE
+ON core_product FOR EACH ROW
 BEGIN
-	DECLARE pprice DOUBLE DEFAULT 0;
-    select Price into pprice from core_product where ID=OLD.ProductID;
-	UPDATE core_cart set Total=Total-(pprice*OLD.quantity) where CartID=OLD.CartID;
+	delete from core_orderdetails where ProductID=OLD.ID;
+    delete from core_cartdetails where ProductID=OLD.ID;
 END$$    
 
 DELIMITER ;
-drop trigger on_update_cartdetails;
-------------------------------------------------------- 
+drop trigger on_delete_product;											
+
+--------------------------------- 
 
 DELIMITER $$
 CREATE TRIGGER on_delete_orderdetails
@@ -71,23 +99,9 @@ BEGIN
 END$$    
 
 DELIMITER ;
+drop trigger on_delete_orderdetails;
+-----------------------------------
 
-
-
-DELIMITER $$
-CREATE TRIGGER on_delete_product
-BEFORE DELETE
-ON core_product FOR EACH ROW
-BEGIN
-	delete from core_orderdetails where ProductID=OLD.ID;
-    delete from core_cartdetails where ProductID=OLD.ID;
-END$$    
-
-DELIMITER ;
-drop trigger on_delete_product;
-
-
---------------------------------- 
 
 DELIMITER $$
 CREATE TRIGGER on_create_orderdetails
@@ -98,3 +112,6 @@ BEGIN
 END$$    
 
 DELIMITER ;
+drop trigger on_create_orderdetails;
+-------------------------------------------
+show triggers;

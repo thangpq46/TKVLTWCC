@@ -242,6 +242,7 @@ export default {
           this.status="This Email already used!"
         }
       }
+      await this.$auth.fetchUser()
     },
     async changepassword() {
       const config = {
