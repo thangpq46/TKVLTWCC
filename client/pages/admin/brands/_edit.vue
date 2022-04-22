@@ -93,7 +93,7 @@ export default {
       if (!files.length) {
         return;
       }
-      this.product.img = files[0];
+      this.brand.img = files[0];
       this.createImage(files[0]);
     },
     createImage(file) {

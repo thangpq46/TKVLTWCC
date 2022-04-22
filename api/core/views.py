@@ -266,8 +266,9 @@ def productadminview(request):
         if request.method == 'POST':
             if(type(img)!=str):
                 temp = Profile.objects.create(username=request.user,img=img)
+                Product.objects.filter(productid=productid).update(img=temp.img)
                 temp.delete()
-            Product.objects.filter(productid=productid).update(productcode=productcode,name=name,price=price,description=description,img=img,stock=stock,brandname=brand)
+            Product.objects.filter(productid=productid).update(productcode=productcode,name=name,price=price,description=description,stock=stock,brandname=brand)
             return Response(status=status.HTTP_202_ACCEPTED)
 
 
@@ -369,25 +370,23 @@ def Brandbycode(request,code):
 @api_view(['POST','DELETE','PUT'])
 @permission_classes([IsAdminUser])
 def Brandedit(request):
-    print(request.data)
+    brandid = request.data.get('id')
+    name = request.data.get('brandname')
+    branddes = request.data.get('branddes')
+    img = request.data.get('img')
+    print(img)
+    print(type(img))
     if request.method == 'DELETE':
         Brand.objects.filter(id=request.data.get('brandid')).delete()
     elif request.method == 'POST':
-        pass
-        brandid = request.data.get('id')
-        name = request.data.get('brandname')
-        price = request.data.get('branddes')
-        img = request.data.get('img')
-    #     if request.method == 'PUT':
-    #         if not Product.objects.filter(productcode=productcode).exists() and not Product.objects.filter(name=name).exists() :
-    #             Product.objects.create(productcode=productcode, name=name,price=price, description=description,img=img, brandname=brand,stock=stock)
-    #             return Response(status=status.HTTP_201_CREATED)
-    #         else:
-    #             return Response(status=status.HTTP_409_CONFLICT)
-    #     if request.method == 'POST':
-    #         if(type(img)!=str):
-    #             temp = Profile.objects.create(username=request.user,img=img)
-    #             temp.delete()
-    #         Product.objects.filter(productid=productid).update(productcode=productcode,name=name,price=price,description=description,img=img,stock=stock,brandname=brand)
-    #         return Response(status=status.HTTP_202_ACCEPTED)
+        temp = Brand.objects.create(brandname=name,branddes=branddes,img=img)
+        if(type(img)!=str):
+            Brand.objects.filter(id=brandid).update(img=temp.img)
+            temp.delete()
+        Brand.objects.filter(id=brandid).update(brandname=name,branddes=branddes)
+    elif request.method == 'PUT':
+        if not Brand.objects.filter(brandname=name).exists() :
+            Brand.objects.create(brandname=name,branddes=branddes,img=img)
+        else:
+            return Response(status=status.HTTP_409_CONFLICT)    
     return Response(status=status.HTTP_202_ACCEPTED)
