@@ -123,6 +123,7 @@ export default {
           { data: { brandid } }
         );
         // add nofi make sure user want to delete product
+        confirm("Are you sure you want to delete this item!")
       } catch (e) {
         console.log(e);
       }

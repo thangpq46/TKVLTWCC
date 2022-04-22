@@ -1,6 +1,6 @@
 <template>
   <div>
-    {{orders}}
+    <!-- {{orders}} -->
     <Header-admin></Header-admin>
     <div class="section">
       <div class="container-fluid">
@@ -22,28 +22,30 @@
                   <table class="table align-middle table-bordered">
                     <thead>
                       <tr>
-                        <th colspan="4">ĐƠN HÀNG {{ order.orderid }}</th>
+                        <th colspan="5">ĐƠN HÀNG {{ order.orderid }}</th>
                       </tr>
                     </thead>
                     <tr>
                       <td>Ngày đặt hàng</td>
-                      <td colspan="3">
+                      <td colspan="4">
                         {{ order.orderdate }}
                       </td>
                     </tr>
                     <tr>
-                      <td>Tên Người Đặt</td>
-                      <td colspan="3">
+                      <td>Tên người đặt</td>
+                      <td colspan="4">
                         {{ order.username }}
                       </td>
-                      <td>Số Điện Thoại</td>
-                      <td colspan="3">
+                    </tr>
+                    <tr>
+                      <td>Số điện thoại</td>
+                      <td colspan="4">
                         {{ order.userphonenum }}
                       </td>
                     </tr>
                     <tr>
                       <td>Địa chỉ</td>
-                      <td colspan="3">
+                      <td colspan="4">
                         {{ order.orderaddress }}
                       </td>
                     </tr>
@@ -75,12 +77,12 @@
                           />
                         </a>
                       </th>
-                      <th>{{details.intomoney }}</th>
+                      <th class="align-middle">{{details.intomoney }}$</th>
                     </tr>
                     <tr>
                       <th>Tổng :</th>
                       <th colspan="2">{{ order.total }}$</th>
-                      <th>
+                      <th colspan="2">
                         <span
                           class="text-success"
                           v-if="order.orderstatus === 2"
@@ -139,16 +141,16 @@ export default {
         const response= await this.$axios.delete('adminorderview/', {
           data: { orderid: OrderID },
         })
-        if(response.status==202){
-          //nofi success delete
+        if(response.status===202){
+          // nofi success delete
         }
       }
       else{
         const response= await this.$axios.post('adminorderview/', {
         orderid: OrderID,
       })
-        if(response.status==200){
-          //nofi change status 
+        if(response.status===200){
+          // nofi change status 
         }
       }
       this.$nuxt.refresh()

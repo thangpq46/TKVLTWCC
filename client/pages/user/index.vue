@@ -119,16 +119,17 @@
               <tr>
                 <td>Password</td>
                 <td>
-                  <input type="password" v-model="password" class="form-control" />
+                  <input v-if="!isediting1" type="password" value="********"  class="form-control" disabled  />
+                  <input v-else type="password" v-model="password" class="form-control" />
                 </td>
               </tr>
-              <tr>
+              <tr v-if="isediting1">
                 <td>New password</td>
                 <td>
                   <input type="password" v-model="new_password" class="form-control" />
                 </td>
               </tr>
-              <tr>
+              <tr v-if="isediting1">
                 <td>Retype password</td>
                 <td>
                   <input type="password" v-model="rnew_password" class="form-control" />
@@ -146,10 +147,18 @@
                 <td></td>
                 <td>
                   <input
+                      v-if="isediting1 === false"
+                      type="button"
+                      @click="usereditpassword('')"
+                      class="btn btn-danger"
+                      value="Chỉnh sửa"
+                    />
+                  <input
+                    v-else
                     type="button"
                     class="btn btn-danger"
                     value="Lưu thay đổi"
-                    @click="changepassword"
+                    @click="changepassword "
                   />
                 </td>
               </tr>
@@ -188,6 +197,7 @@ export default {
       preview: '',
       status: '',
       isediting: false,
+      isediting1: false,
     }
   },
   methods: {
@@ -210,6 +220,9 @@ export default {
     usereditinfo() {
       this.isediting = !this.isediting
     },
+    usereditpassword() {
+      this.isediting1 = !this.isediting1
+    },
     async submituser() {
       const config = {
         headers: { 'content-type': 'multipart/form-data' },
@@ -221,11 +234,11 @@ export default {
       try {
         const respons= await this.$axios.$post('/updateuser/', formData, config)
         this.usereditinfo()
-        if (respons.status ==202){
+        if (respons.status ===202){
           this.status="success"
         }
       } catch (e) {
-        if(e.response.status ==409){
+        if(e.response.status ===409){
           this.status="This Email already used!"
         }
       }
@@ -240,15 +253,15 @@ export default {
       formData.append('rnew_password', this.rnew_password)
       try{
         const response = await this.$axios.post('/changepass/', formData, config)
-        if(response.status==202){
-          this.status="success"     //add nofi
+        if(response.status===202){
+          this.status="success"     // add nofi
         }
       }
       catch (e) {
-        if(e.response.status==400){
+        if(e.response.status===400){
           this.status="Incorrect Password"  
         }
-        else if (e.response.status ==412){
+        else if (e.response.status ===412){
           this.status="Password not strong enough"  
         }
         else{

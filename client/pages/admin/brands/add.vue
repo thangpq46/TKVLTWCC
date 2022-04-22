@@ -112,12 +112,14 @@ export default {
       }
       try {
         const response= await this.$axios.$put("/adminbrand/",formData,config);
-        if(response.status==202){
+        if(response.status===202){
             // ĐÃ THÀNH CÔNG-> CHUYỂN HƯỚNG VỀ TRANG HÃNG
+            alert("Success!")
         }
       } catch (e) {
-          if(e.response.status==409){
+          if(e.response.status===409){
             //   Tên Hãng đã tồn tại
+            alert("Brand name already exists!")
           }
       }
     }

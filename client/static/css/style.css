@@ -2293,4 +2293,12 @@ a {
     justify-content: center;
     align-items: center;
 }
-
+.notification-adm{
+  border-left: 4px solid rgb(0, 158, 58);
+  padding: 10px 0px;
+}
+.notification-adm span {
+  font-size: 18px;
+  margin-left: 15px;
+  color: green;
+}
