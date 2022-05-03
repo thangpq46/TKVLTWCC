@@ -1,11 +1,13 @@
 <template>
   <div class="bg-color-brown">
+    <notifications position="top center" ignoreDuplicates width=400 height=700 group="foo" />
     <Header :brands="brands"></Header>
     <BannerTop />
     <div class="section section-info-customer pd-top-20">
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-md-11 col-12 no-pd">
+            
             <h5>Thông tin tài khoản</h5>
           </div>
         </div>
@@ -232,16 +234,29 @@ export default {
         formData.append(data, this.user[data])
       }
       try {
-        const respons= await this.$axios.$post('/updateuser/', formData, config)
+        const respons= await this.$axios.post('/updateuser/', formData, config)
         this.usereditinfo()
+        console.log(respons)
         if (respons.status ===202){
-          this.status="success"
+          this.$notify({
+            group: 'foo',
+            title: 'Notification',
+            text: "Change user informations successfuly",
+          })
         }
+        
       } catch (e) {
         if(e.response.status ===409){
           this.status="This Email already used!"
         }
+        this.$notify({
+            group: 'foo',
+            type:'error',
+            title: 'Error',
+            text: this.status,
+          })
       }
+      
       await this.$auth.fetchUser()
     },
     async changepassword() {
@@ -255,19 +270,31 @@ export default {
       try{
         const response = await this.$axios.post('/changepass/', formData, config)
         if(response.status===202){
-          this.status="success"     // add nofi
+          this.status="Password change successfuly!"     // add nofi
+          this.$notify({
+            group: 'foo',
+            title: 'Notification',
+            text: this.status,
+          })
         }
       }
       catch (e) {
         if(e.response.status===400){
           this.status="Incorrect Password"  
+          
         }
         else if (e.response.status ===412){
-          this.status="Password not strong enough"  
+          this.status="Password not strong enough!"  
         }
         else{
-          this.status="new password no match"
+          this.status="New password does't match!"
         }
+        this.$notify({
+            group: 'foo',
+            type:'error',
+            title: 'Error',
+            text: this.status,
+          })
       }
       this.$nuxt.refresh()
     },

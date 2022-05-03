@@ -1,5 +1,6 @@
 <template>
   <div>
+    <notifications group="foo" />
     <Header-admin></Header-admin>
     <div class="section bg-color-brown">
       <div class="container-fluid">

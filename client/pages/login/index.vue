@@ -1,8 +1,10 @@
 <template>
   <div class="login-form-body">
+    <notifications position="top center" ignoreDuplicates width=400 height=700 group="foo" />
     <div class="login-box">
       <h2>Login</h2>
-      <Notification v-if="status!=''" :message="status" />
+      
+      <!-- <Notifi v-if="status != ''" :message="status" /> -->
       <form>
         <div class="user-box">
           <input v-model="user.username" type="text" name="" required="" />
@@ -12,7 +14,7 @@
           <input v-model="user.password" type="password" name="" required="" />
           <label>Password</label>
         </div>
-        <a @click="login">
+        <a @click="login()">
           <span></span>
           <span></span>
           <span></span>
@@ -25,9 +27,10 @@
 </template>
 
 <script>
-import Notification from '../../components/Notification.vue'
+import Vue from 'vue'
+import Notifi from '../../components/Notifi.vue'
 export default {
-  components: { Notification },
+  components: { Notifi },
   name: 'Login',
   layout: 'clean',
 
@@ -37,36 +40,55 @@ export default {
         username: '',
         password: '',
       },
-      status:"",
+      status: '',
     }
   },
 
   methods: {
     async login() {
       try {
-        const response= await this.$auth.loginWith('local', {
+        const response = await this.$auth.loginWith('local', {
           data: this.user,
         })
         console.log(response)
         if (this.$auth.user.is_staff) {
           this.$router.push('/admin')
-        }
-        else if(response.status===200) {
+          this.$notify({
+            group: 'foo',
+            title: 'Important message',
+            text: 'Hello user! This is a notification!',
+            duration: 10000
+          })
+        } else if (response.status === 200) {
+          
           this.$router.push('/')
         }
       } catch (e) {
         console.log(e)
-        if(e.response.status===204){
-          this.status = "Please fill all fields!"
+        if (e.response.status === 204) {
+          this.status = 'Please fill all fields!'
+        } else if (e.response.status === 404) {
+          this.status = 'Username does not exist!'
+        } else if (e.response.status === 401) {
+          this.status = 'Incorrect password!'
         }
-        else if(e.response.status===404){
-          this.status = "Username does not exist!"
-        }
-        else if(e.response.status===401){
-          this.status = "Incorrect password!"
-        }
+        this.$notify({
+            group: 'foo',
+            type:'error',
+            title: 'Error',
+            text: this.status,
+          })
       }
       this.$nuxt.refresh()
+    },
+    doNotifi() {
+      this.$notify({
+            group: 'foo',
+            type:'error',
+            position:'top',
+            title: 'Important message',
+            text: 'Hello user! This is a notification!',
+          })
     },
   },
 }

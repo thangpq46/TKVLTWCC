@@ -2,8 +2,11 @@
   <div>
     <Header-admin></Header-admin>
     <div class="section bg-color-brown">
+      
       <div class="container-fluid">
+        
         <div class="row">
+          
           <div class="col-md-2 col-4 bg-color-admin">
             <Left-admin></Left-admin>
           </div>
@@ -19,7 +22,7 @@
                   <div class="col-md-11 col-12 bg-white bd-rd-5 mg-bottom-20">
                     
                       <table class="table ">
-
+                        <notifications position="top center" ignoreDuplicates width=400 height=700 group="productadmin" />
                         <tr>
                           <th>Hình ảnh</th>
                           <td>
@@ -163,6 +166,11 @@ export default {
       try {
         await this.$axios.$post("/productadminview/",formData,config);
         this.$router.push('/admin/products/'+this.product.productcode)
+        this.$notify({
+            title: 'Notification',
+            group: 'productadmin',
+            text: 'Change Success',
+          })
       } catch (e) {
       }
     },

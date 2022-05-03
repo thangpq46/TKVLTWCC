@@ -1,6 +1,7 @@
 <template>
   <div>
     <Header-admin></Header-admin>
+    <notifications position="top center" ignoreDuplicates width=400 height=700 group="foo" />
     <div class="section bg-color-brown">
       <div class="container-fluid">
         <div class="row">
@@ -113,8 +114,23 @@ export default {
         formData.append(data,brand[data]);
       }
       try {
-        await this.$axios.$post("/adminbrand/",formData,config);
+        const response= await this.$axios.post("/adminbrand/",formData,config);
+        if(response.status==202){
+          this.$notify({
+            title: 'Notification',
+            group: 'foo',
+            text: 'Change Success!',
+          })
+        }
       } catch (e) {
+        if(e.response.status==409){
+          this.$notify({
+            title: 'Error',
+            group: 'foo',
+            type:'error',
+            text: 'BrandName Already exist!',
+          })
+        }
       }
     },
     async deleteBrand(brandid) {

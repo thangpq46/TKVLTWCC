@@ -3,7 +3,8 @@
     <div class="login-form-body">
       <div class="login-box">
         <h2>Register</h2>
-        <Notification v-if="status!=''" :message="status" />
+        <notifications position="top center" ignoreDuplicates width=400 height=700 group="foo" />
+        <Notifi v-if="status!=''" :message="status" />
         <form>
           <div class="user-box">
             <input v-model="user.username" type="text" name="" required />
@@ -53,14 +54,9 @@
 </template>
 
 <script>
-import Notification from '~/components/Notification'
-
 export default {
   auth: 'guest',
   name: 'Login',
-  components: {
-    Notification,
-  },
   layout: 'clean',
   data() {
     return {
@@ -96,6 +92,12 @@ export default {
         } else if (e.response.status == 510) {
           this.status = 'Password not Match!'
         }
+        this.$notify({
+            group: 'foo',
+            type:'error',
+            title: 'Error',
+            text: this.status,
+          })
       }
     },
   },
