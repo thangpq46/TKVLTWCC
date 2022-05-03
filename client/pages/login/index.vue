@@ -2,6 +2,7 @@
   <div class="login-form-body">
     <div class="login-box">
       <h2>Login</h2>
+      <Notification v-if="status!=''" :message="status" />
       <form>
         <div class="user-box">
           <input v-model="user.username" type="text" name="" required="" />
@@ -24,7 +25,9 @@
 </template>
 
 <script>
+import Notification from '../../components/Notification.vue'
 export default {
+  components: { Notification },
   name: 'Login',
   layout: 'clean',
 
@@ -34,6 +37,7 @@ export default {
         username: '',
         password: '',
       },
+      status:"",
     }
   },
 
@@ -53,16 +57,13 @@ export default {
       } catch (e) {
         console.log(e)
         if(e.response.status===204){
-          // this.status = "Please fill all fields!"
-          alert("Please fill all fields!")
+          this.status = "Please fill all fields!"
         }
         else if(e.response.status===404){
-          // this.status = "Username does not exist!"
-          alert("Username does not exist!")
+          this.status = "Username does not exist!"
         }
         else if(e.response.status===401){
-          // this.status = "Incorrect password!"
-          alert("Incorrect password!")
+          this.status = "Incorrect password!"
         }
       }
       this.$nuxt.refresh()

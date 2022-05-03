@@ -34,7 +34,7 @@
                 <tr>
                   <td>Avatar</td>
                   <td><img :src="preview" width="100px" height="auto" />
-                  <input v-if="isediting === true" type="file" @change="onFileChange" /></td>
+                  <input v-if="isediting === true" type="file"  accept="image/png, image/jpeg" @change="onFileChange" /></td>
                 </tr>
                 <tr>
                   <td>Firstname</td>

@@ -115,7 +115,7 @@
                       >
                     </div>
                   </div>
-                  <NuxtLink to="cart/checkout"
+                  <NuxtLink to="/"
                     ><button
                       type="button"
                       class="btn muahang"
@@ -163,9 +163,9 @@ export default {
         address,
         })
         if(response.status===202){
-          // must haave nofi success on place order
           this.$router.push('/')
           await this.$auth.fetchUser()
+          alert("Đặt Hàng Thành Công")
         }
       }
       catch(e){

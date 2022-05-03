@@ -25,7 +25,6 @@ class Product(models.Model):
     stock = models.IntegerField(db_column='Stock')  # Field name made lowercase.
     createdate = models.DateField(db_column='CreateDate',default=dateupdate())  # Field name made lowercase.
     brandname = models.ForeignKey(Brand, models.CASCADE, db_column='BrandName')  # Field name made lowercase.
-
     class Meta:
         db_table = 'core_product'
 

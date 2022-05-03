@@ -3,7 +3,7 @@
     <div class="login-form-body">
       <div class="login-box">
         <h2>Register</h2>
-        <Notification v-if="status" :message="status" />
+        <Notification v-if="status!=''" :message="status" />
         <form>
           <div class="user-box">
             <input v-model="user.username" type="text" name="" required />
@@ -72,7 +72,7 @@ export default {
         last_name: '',
         rpassword: '',
       },
-      status: null,
+      status: "",
     }
   },
 
@@ -82,7 +82,6 @@ export default {
         const response = await this.$axios.post('register/', {
           user: this.user,
         })
-        // console.log(response.status)
         if (response.status == 201) {
           this.$router.push('/login/')
         }
@@ -91,9 +90,9 @@ export default {
         if (e.response.status == 409) {
           this.status = 'Username or Email already exist!'
         } else if (e.response.status == 428) {
-          this.status = 'Password too Weak!'
+          this.status = 'Password not strong enough!'
         } else if (e.response.status == 204) {
-          this.status = 'You must fill all the fields'
+          this.status = 'You must fill all the fields!'
         } else if (e.response.status == 510) {
           this.status = 'Password not Match!'
         }

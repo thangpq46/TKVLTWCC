@@ -23,7 +23,7 @@
                         <th>Hình ảnh</th>
                         <td>
                           <img :src="preview" height="100px" width="150px"/>
-                          <input type="file" @change="onFileChange" />
+                          <input type="file" accept="image/png, image/jpeg" @change="onFileChange" />
                         </td>
                       </tr>
                       <tr>
