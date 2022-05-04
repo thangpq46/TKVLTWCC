@@ -1,5 +1,6 @@
 <template>
   <div>
+    <notifications position="top right" ignoreDuplicates width=400 height=700 group="foo" />
     <div class="product-img">
       <a :href="getproductsurl(product.productcode)">
         <img
@@ -49,6 +50,11 @@ export default {
           productid: productid,
         })
         await this.$auth.fetchUser()
+        this.$notify({
+            group: 'foo',
+            title: 'Notification',
+            text: 'Added to Cart!',
+          })
       } else {
         this.$router.push('/login/')
       }

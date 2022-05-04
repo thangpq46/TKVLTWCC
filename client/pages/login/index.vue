@@ -59,6 +59,7 @@ export default {
             text: 'Hello user! This is a notification!',
             duration: 10000
           })
+          console.log(response)
         } else if (response.status === 200) {
           
           this.$router.push('/')

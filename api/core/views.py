@@ -58,7 +58,7 @@ def get_provinces_json(request):
     provinces =orjson.loads(NESTED_DIVISIONS_JSON_PATH.read_bytes())
     return Response(provinces)
 
-def validpassword(p):
+def validpassword(p):       #@t04062001
     if (len(p)<6 or len(p)>12) or not re.search("[a-z]",p) or not re.search("[0-9]",p) or not re.search("[A-Z]",p) :
         return False
     return True
@@ -183,7 +183,7 @@ def Checkout(request):
 
 @api_view(['GET'])
 def NewProductView(request):
-    queryset=Product.objects.exclude(stock=0).order_by('-createdate')[:8]
+    queryset=Product.objects.exclude(stock=0).order_by('-createdate')[:8]  
     serializers=ProductSerializer(queryset,many=True,context={'request': request}).data
     return Response(serializers)
 
@@ -349,13 +349,17 @@ def changepassword(request):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def dashboard(request):
-    nusers= len(User.objects.all())
+    nusers= len(User.objects.all()) 
     nproducts = len(Product.objects.all())
     norders = len(Orders.objects.all())
-    nfeedback = len(Feedback.objects.all())
-    orderspending = len(Orders.objects.filter(orderstatus=0))
+    nfeedback = len(Feedback.objects.all()) 
+    orderspending = len(Orders.objects.filter(orderstatus=0)) 
     outofstockproducts=len(Product.objects.filter(stock=0))
-    dashboard = { 'numorders': norders,'numusers':nusers,'numproducts':nproducts,'numfeedback':nfeedback,'pendingorders':orderspending,'poutofstocks':outofstockproducts}
+    dashboard = { 'numorders': norders,'numusers':nusers,
+        'numproducts':nproducts,
+        'numfeedback':nfeedback,
+        'pendingorders':orderspending,
+        'poutofstocks':outofstockproducts}
     return Response(dashboard)
 
 @api_view(['GET'])  
@@ -371,10 +375,8 @@ def Brandedit(request):
     name = request.data.get('brandname')
     branddes = request.data.get('branddes')
     img = request.data.get('img')
-    print(img)
-    print(type(img))
     if request.method == 'DELETE':
-        Brand.objects.filter(id=request.data.get('brandid')).delete()
+        Brand.objects.filter(id=request.data.get('brandid')).delete() 
     elif request.method == 'POST':
         temp = Brand.objects.create(brandname=name,branddes=branddes,img=img)
         if(type(img)!=str):
@@ -382,7 +384,7 @@ def Brandedit(request):
             temp.delete()
         Brand.objects.filter(id=brandid).update(brandname=name,branddes=branddes)
     elif request.method == 'PUT':
-        if not Brand.objects.filter(brandname=name).exists() :
+        if not Brand.objects.filter(brandname=name).exists() :  #TRUE
             Brand.objects.create(brandname=name,branddes=branddes,img=img)
         else:
             return Response(status=status.HTTP_409_CONFLICT)    

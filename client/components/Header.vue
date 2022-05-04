@@ -343,6 +343,7 @@ export default {
     },
     nologin() {
       alert('Bạn hiện tại chưa đăng nhập!')
+      this.$router.push('/login/')
     },
   },
 }

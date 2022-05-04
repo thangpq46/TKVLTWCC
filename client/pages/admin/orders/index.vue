@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- {{orders}} -->
+    <notifications position="top center" ignoreDuplicates width=400 height=700 group="foo" />
     <Header-admin></Header-admin>
     <div class="section">
       <div class="container-fluid">
@@ -142,7 +142,12 @@ export default {
           data: { orderid: OrderID },
         })
         if(response.status===202){
-          // nofi success delete
+          this.$notify({
+            group: 'foo',
+            position:'top center',
+            title: 'Notification',
+            text: 'Cancel Order Successfuly!',
+          })
         }
       }
       else{
@@ -150,7 +155,11 @@ export default {
         orderid: OrderID,
       })
         if(response.status===200){
-          // nofi change status 
+          this.$notify({
+            group: 'foo',
+            title: 'Notification',
+            text: 'Change Order State Successfuly!',
+          }) 
         }
       }
       this.$nuxt.refresh()
