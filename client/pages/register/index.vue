@@ -4,7 +4,7 @@
       <div class="login-box">
         <h2>Register</h2>
         <notifications position="top center" ignoreDuplicates width=400 height=700 group="foo" />
-        <Notifi v-if="status!=''" :message="status" />
+        <!-- <Notifi v-if="status!=''" :message="status" /> -->
         <form>
           <div class="user-box">
             <input v-model="user.username" type="text" name="" required />

@@ -12,6 +12,7 @@ from rest_framework.permissions import *
 from .serializers import *
 from .models import *
 import orjson
+from django.conf import settings
 from vietnam_provinces import NESTED_DIVISIONS_JSON_PATH
 @api_view(['POST'])
 def login(request):
@@ -58,7 +59,7 @@ def get_provinces_json(request):
     provinces =orjson.loads(NESTED_DIVISIONS_JSON_PATH.read_bytes())
     return Response(provinces)
 
-def validpassword(p):       #@t04062001
+def validpassword(p):       
     if (len(p)<6 or len(p)>12) or not re.search("[a-z]",p) or not re.search("[0-9]",p) or not re.search("[A-Z]",p) :
         return False
     return True
@@ -181,8 +182,14 @@ def Checkout(request):
     Cartdetails.objects.filter(cartid=cart).delete()
     return Response(status=status.HTTP_202_ACCEPTED)
 
+
 @api_view(['GET'])
 def NewProductView(request):
+    # cursor = connection.cursor()
+    # cursor.execute("SELECT * FROM newproduct;")
+    # products=dictfetchall(cursor)
+    # for p in products:
+    #     p['IMG']=request.get_host()+settings.MEDIA_URL+p['IMG']
     queryset=Product.objects.exclude(stock=0).order_by('-createdate')[:8]  
     serializers=ProductSerializer(queryset,many=True,context={'request': request}).data
     return Response(serializers)
@@ -228,7 +235,7 @@ def AdminOrderView(request):
             order['details']=details
         return Response(orders,status=status.HTTP_200_OK)
     elif request.method == 'POST':
-        orderid = request.data.get('orderid')
+        orderid = request.data.get('orderid')       #0:pending 1:confirmed 2:đã thành công -1:canceled
         order = Orders.objects.get(orderid=orderid)
         order.orderstatus+=1
         order.save()
@@ -346,15 +353,30 @@ def changepassword(request):
     user.save()
     return Response(status=status.HTTP_202_ACCEPTED)
 
+def dictfetchall(cursor):
+    # "Return all rows from a cursor as a dict"
+    columns = [col[0] for col in cursor.description]
+    return [
+        dict(zip(columns, row))
+        for row in cursor.fetchall()
+    ]
+
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def dashboard(request):
-    nusers= len(User.objects.all()) 
-    nproducts = len(Product.objects.all())
-    norders = len(Orders.objects.all())
-    nfeedback = len(Feedback.objects.all()) 
-    orderspending = len(Orders.objects.filter(orderstatus=0)) 
-    outofstockproducts=len(Product.objects.filter(stock=0))
+    cursor = connection.cursor()
+    cursor.execute("select getnumberofuser()")
+    nusers= int(cursor.fetchone()[0]) 
+    cursor.execute("select getnumberofproducts()")
+    nproducts = int(cursor.fetchone()[0])
+    cursor.execute("select getnumberoforders()")
+    norders = int(cursor.fetchone()[0])
+    cursor.execute("select getnumberoffeedback()")
+    nfeedback = int(cursor.fetchone()[0])
+    cursor.execute("select getnumberoforderspending()")
+    orderspending = int(cursor.fetchone()[0])
+    cursor.execute("select getnumberofproductoutofstock()")
+    outofstockproducts=int(cursor.fetchone()[0])
     dashboard = { 'numorders': norders,'numusers':nusers,
         'numproducts':nproducts,
         'numfeedback':nfeedback,
