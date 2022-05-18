@@ -185,24 +185,19 @@ def Checkout(request):
 
 @api_view(['GET'])
 def NewProductView(request):
-    # cursor = connection.cursor()
-    # cursor.execute("SELECT * FROM newproduct;")
-    # products=dictfetchall(cursor)
-    # for p in products:
-    #     p['IMG']=request.get_host()+settings.MEDIA_URL+p['IMG']
-    queryset=Product.objects.exclude(stock=0).order_by('-createdate')[:8]  
+    queryset=Product.objects.raw("SELECT * FROM newproduct")  
     serializers=ProductSerializer(queryset,many=True,context={'request': request}).data
     return Response(serializers)
 
 @api_view(['GET'])
 def instockProductView(request):
-    queryset=Product.objects.exclude(stock=0).order_by('-stock')[:8]
+    queryset=Product.objects.raw("SELECT * FROM instockproduct")
     serializers=ProductSerializer(queryset,many=True,context={'request': request}).data
     return Response(serializers)
 
 @api_view(['GET'])
 def HotProductView(request):
-    queryset=Product.objects.exclude(stock=0).order_by('stock')[:8]
+    queryset=Product.objects.raw("SELECT * FROM hotproducts")
     serializers=ProductSerializer(queryset,many=True,context={'request': request}).data
     return Response(serializers)
     

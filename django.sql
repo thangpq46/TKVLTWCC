@@ -39,7 +39,7 @@ BEGIN
 END$$    
 
 DELIMITER ;
-drop trigger on_create_cartdetails;
+-- drop trigger on_create_cartdetails;
 ----------------------------------------
 DELIMITER $$
 
@@ -53,7 +53,7 @@ BEGIN
 END$$    
 
 DELIMITER ;
-drop trigger on_update_cartdetails;
+-- drop trigger on_update_cartdetails;
 ------------------------------------------------------- 
 
 -----------------------------------------------
@@ -70,7 +70,7 @@ BEGIN
 END$$    
 
 DELIMITER ;
-drop trigger on_delete_cartdetails;
+-- drop trigger on_delete_cartdetails;
 ------------------------------------------------ 
 
 
@@ -84,7 +84,7 @@ BEGIN
 END$$    
 
 DELIMITER ;
-drop trigger on_delete_product;											
+-- drop trigger on_delete_product;											
 
 --------------------------------- 
 
@@ -99,7 +99,7 @@ BEGIN
 END$$    
 
 DELIMITER ;
-drop trigger on_delete_orderdetails;
+-- drop trigger on_delete_orderdetails;
 -----------------------------------
 
 
@@ -112,6 +112,138 @@ BEGIN
 END$$    
 
 DELIMITER ;
-drop trigger on_create_orderdetails;
--------------------------------------------
+-- drop trigger on_create_orderdetails;
+-- -------------------------------------------
 show triggers;
+------------------------------------------
+CREATE 
+    ALGORITHM = UNDEFINED 
+    DEFINER = `root`@`localhost` 
+    SQL SECURITY DEFINER
+VIEW `hotproducts` AS
+    SELECT 
+        `core_product`.`ID` AS `ID`,
+        `core_product`.`ProductCode` AS `ProductCode`,
+        `core_product`.`Name` AS `Name`,
+        `core_product`.`Price` AS `Price`,
+        `core_product`.`IMG` AS `IMG`,
+        `core_product`.`Description` AS `Description`,
+        `core_product`.`Stock` AS `Stock`,
+        `core_product`.`CreateDate` AS `CreateDate`,
+        `core_product`.`BrandName` AS `BrandName`
+    FROM
+        `core_product`
+    ORDER BY `core_product`.`Stock`
+    LIMIT 8;
+
+------------------------------------------
+CREATE 
+    ALGORITHM = UNDEFINED 
+    DEFINER = `root`@`localhost` 
+    SQL SECURITY DEFINER
+VIEW `instockproduct` AS
+    SELECT 
+        `core_product`.`ID` AS `ID`,
+        `core_product`.`ProductCode` AS `ProductCode`,
+        `core_product`.`Name` AS `Name`,
+        `core_product`.`Price` AS `Price`,
+        `core_product`.`IMG` AS `IMG`,
+        `core_product`.`Description` AS `Description`,
+        `core_product`.`Stock` AS `Stock`,
+        `core_product`.`CreateDate` AS `CreateDate`,
+        `core_product`.`BrandName` AS `BrandName`
+    FROM
+        `core_product`
+    ORDER BY `core_product`.`Stock` DESC
+    LIMIT 8;
+-----------------------------------------
+    CREATE 
+    ALGORITHM = UNDEFINED 
+    DEFINER = `root`@`localhost` 
+    SQL SECURITY DEFINER
+VIEW `newproduct` AS
+    SELECT 
+        `core_product`.`ID` AS `ID`,
+        `core_product`.`ProductCode` AS `ProductCode`,
+        `core_product`.`Name` AS `Name`,
+        `core_product`.`Price` AS `Price`,
+        `core_product`.`IMG` AS `IMG`,
+        `core_product`.`Description` AS `Description`,
+        `core_product`.`Stock` AS `Stock`,
+        `core_product`.`CreateDate` AS `CreateDate`,
+        `core_product`.`BrandName` AS `BrandName`
+    FROM
+        `core_product`
+    ORDER BY `core_product`.`CreateDate` DESC
+    LIMIT 8;
+    ---------------------------------------
+DELIMITER $$
+
+CREATE FUNCTION getnumberoffeedback() RETURNS int
+    DETERMINISTIC
+BEGIN
+	DECLARE count integer default 0;
+    select count(*) into count from core_feedback;
+RETURN count;
+END $$
+
+DELIMITER ;
+---------------------------------------------------
+DELIMITER $$
+
+CREATE FUNCTION getnumberoforders() RETURNS int
+    DETERMINISTIC
+BEGIN
+	DECLARE count integer default 0;
+    select count(*) into count from core_orders;
+RETURN count;
+END $$
+
+DELIMITER ;
+----------------------------------------------------
+DELIMITER $$
+
+CREATE FUNCTION `getnumberoforderspending`() RETURNS int
+    DETERMINISTIC
+BEGIN
+	DECLARE count integer default 0;
+    select count(*) into count from core_orders where OrderStatus=0;
+RETURN count;
+END $$
+
+DELIMITER ;
+------------------------------------------------------
+DELIMITER $$
+
+CREATE FUNCTION `getnumberofproductoutofstock`() RETURNS int
+    DETERMINISTIC
+BEGIN
+	DECLARE count integer default 0;
+    select count(*) into count from core_product where Stock=0;
+RETURN count;
+END $$
+
+DELIMITER ;
+--------------------------------------------------
+DELIMITER $$
+
+CREATE FUNCTION `getnumberofproducts`() RETURNS int
+    DETERMINISTIC
+BEGIN
+	DECLARE count integer default 0;
+    select count(*) into count from core_product;
+RETURN count;
+END $$
+
+DELIMITER ;
+------------------------------------------------------
+DELIMITER $$
+
+CREATE FUNCTION `getnumberofuser`() RETURNS int
+    DETERMINISTIC
+BEGIN
+	DECLARE count integer default 0;
+    select count(*) into count from auth_user;
+RETURN count;
+END $$
+DELIMITER ;
