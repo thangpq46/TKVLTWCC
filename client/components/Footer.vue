@@ -10,12 +10,12 @@
             <div class="row">
               <div class="col-lg-3 col-md-4 col-12">
                 <div class="footer-logo">
-                  <a href="http://localhost:3000">
+                  <NuxtLink to="/">
                     <img
-                      src="http://localhost:3000/images/banner/logo_ankhang.png"
+                      src="/images/banner/logo_ankhang.png"
                       alt="home.php"
                     />
-                  </a>
+                  </NuxtLink>
                 </div>
               </div>
               <div class="col-lg-9 col-md-8 col-12">
@@ -117,11 +117,11 @@
                 <div class="single-footer f-link">
                   <h3>Đường dẫn</h3>
                   <ul>
-                    <li><a href="http://localhost:3000/">Trang chủ</a></li>
-                    <li><a href="http://localhost:3000/introduction">Giới thiệu</a></li>
-                    <li><a href="http://localhost:3000/">Sản phẩm</a></li>
+                    <li><NuxtLink to="/">Trang chủ</NuxtLink></li>
+                    <li><NuxtLink  to="/introduction">Giới thiệu</NuxtLink></li>
+                    <li><NuxtLink to="/">Sản phẩm</NuxtLink></li>
                     <li><a href="javascript:void(0)">Bài viết</a></li>
-                    <li><a href="http://localhost:3000/feedback">Liên hệ</a></li>
+                    <li><NuxtLink to="/feedback">Liên hệ</NuxtLink></li>
                   </ul>
                 </div>
                 <!-- End Single Widget -->

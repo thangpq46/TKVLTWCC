@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Header :preview="preview" :brands="brands"></Header>
+    <Header :brands="brands"></Header>
     <BannerTop />
     <div class="section section-lienhe pd-top-20">
       <div class="container">
@@ -124,6 +124,7 @@
 </template>
 <script>
 export default {
+  auth: false,
   async asyncData({ $axios }) {
     const brands = await $axios.$get('/brand/')
     return { brands }

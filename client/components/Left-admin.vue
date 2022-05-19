@@ -3,9 +3,9 @@
     <div class="left-adm">
       <div>
         <i class="fas fa-tachometer-alt"></i>
-        <a href="http://localhost:3000/admin/">
+        <NuxtLink to="/admin">
           <span>Dashboard</span>
-        </a>
+        </NuxtLink>
       </div>
       <div>
         <i class="fas fa-user"></i>

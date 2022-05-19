@@ -91,12 +91,12 @@
         <div class="row align-items-center" style="height: 100px">
           <div class="col-lg-3 col-md-5 col-sm-5 col-5">
             <div class="head-logo">
-              <a href="http://localhost:3000">
+              <NuxtLink to="/">
                 <img
-                  src="http://localhost:3000/images/banner/logo_ankhang.png"
+                  src="/images/banner/logo_ankhang.png"
                   alt=""
                 />
-              </a>
+              </NuxtLink>
             </div>
           </div>
           <div class="col-lg-4 col-md-0 col-sm-0 col-0 d-max-992-none">
@@ -127,8 +127,8 @@
               <img v-if="$auth.loggedIn" class="preview-img" :src="$auth.user.img" width="40px" height="40" />
               <i v-else class="fas fa-user-circle"></i>
               <h5 v-if="$auth.loggedIn">
-                <a href="http://localhost:3000/user" class="no-decoration" style="color: #fff"
-                  >TÀI KHOẢN</a
+                <NuxtLink to="/user" class="no-decoration" style="color: #fff"
+                  >TÀI KHOẢN</NuxtLink
                 >
                 <div class="dn-dk">
                   <div class="cart-items" style="margin-top: 2.2px">
@@ -141,11 +141,11 @@
                     <div class="shopping-item">
                       <div class="dropdown-cart-header">
                         <span>
-                          <a
-                            href="http://localhost:3000/user/orders"
+                          <NuxtLink
+                            to="/user/orders"
                             style="float: left; no-decoration; font-size: 16px; font-weight: 700"
                             class="no-decoration"
-                            >Lịch sử đơn hàng</a
+                            >Lịch sử đơn hàng</NuxtLink
                           >
                         </span>
                       </div>
@@ -252,26 +252,26 @@
                 >
                   <ul id="nav" class="navbar-nav ms-auto">
                     <li class="nav-item">
-                      <a
-                        href="http://localhost:3000"
+                      <NuxtLink
+                        to="/"
                         class="active"
                         aria-label="Toggle navigation"
-                        >Trang chủ</a
+                        >Trang chủ</NuxtLink
                       >
                     </li>
                     <li class="nav-item">
-                      <a href="http://localhost:3000/introduction" aria-label="Toggle navigation">Giới thiệu</a>
+                      <NuxtLink to="/introduction" aria-label="Toggle navigation">Giới thiệu</NuxtLink>
                     </li>
                     <li class="nav-item">
-                      <a class="dd-menu collapsed" href="http://localhost:3000"
-                        >Sản phẩm</a
+                      <NuxtLink class="dd-menu collapsed" to="/"
+                        >Sản phẩm</NuxtLink
                       >
                     </li>
                     <li class="nav-item">
                       <a href="#" aria-label="Toggle navigation">Blog</a>
                     </li>
                     <li class="nav-item">
-                      <a href="http://localhost:3000/feedback" aria-label="Toggle navigation">Liên hệ</a>
+                      <NuxtLink to="/feedback" aria-label="Toggle navigation">Liên hệ</NuxtLink>
                     </li>
                   </ul>
                 </div>

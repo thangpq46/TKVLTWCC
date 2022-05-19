@@ -6,9 +6,9 @@
           <div class="col-12 dp-flex">
             <div class="logo-adm">
               <i class="bi bi-person-square"></i>
-              <a href="http://localhost:3000/admin/">
+              <NuxtLink to="/admin">
                 <span>Admin</span>
-              </a>
+              </NuxtLink>
             </div>
             <div class="logout-adm mg-right-20">
               <a class="cursor-poin" @click="logout">
