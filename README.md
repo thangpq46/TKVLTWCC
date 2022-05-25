@@ -91,6 +91,6 @@ pip install -r requirements.txt
 ``` npm run dev ```
 ![image](https://user-images.githubusercontent.com/38754038/170183821-431c09bb-2a34-4c2a-8aa2-4b6d2d754846.png)
                               ### ctrl+nhấn vào đường dẫn hoặc gõ **http://localhost:3000/** bằng trình duyệt
-                              
                               ## Chúc Bạn thành công :D
+                              
                                                                                                               
