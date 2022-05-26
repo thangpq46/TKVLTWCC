@@ -11,6 +11,8 @@ BEGIN
     DECLARE pstock INT DEFAULT 0;
     DECLARE carttotal DOUBLE DEFAULT 0;
     DECLARE dquantity INT DEFAULT 0;
+    declare exit handler for sqlexception rollback;
+	start transaction;
     select Price into pprice from core_product where ID=PID;
     select Stock into pstock from core_product where ID=PID;
 	if exists (select * from core_cartdetails where CartID=CID and ProductID=PID) then
@@ -23,6 +25,7 @@ BEGIN
 			insert into core_cartdetails(quantity, CartID, ProductID) value (quan,CID,PID);
 		end if;
     end if;
+    commit;
 END$$
 DELIMITER ;
 ----------------------------------------------- 

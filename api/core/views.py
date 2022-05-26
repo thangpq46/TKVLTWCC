@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate,logout as logoutuser,login as loginuser
+from django.contrib.auth import authenticate,logout as logoutuser
 from django.db import connection
 from rest_framework.reverse import reverse
 import requests
@@ -12,7 +12,6 @@ from rest_framework.permissions import *
 from .serializers import *
 from .models import *
 import orjson
-from django.conf import settings
 from vietnam_provinces import NESTED_DIVISIONS_JSON_PATH
 @api_view(['POST'])
 def login(request):
