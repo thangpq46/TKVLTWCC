@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='product',
             name='createdate',
-            field=models.DateField(db_column='CreateDate', default='21-11-25'),
+            field=models.DateField(db_column='CreateDate', default='2021-11-25'),
         ),
         migrations.AlterField(
             model_name='product',
